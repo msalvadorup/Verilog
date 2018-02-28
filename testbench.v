@@ -29,7 +29,7 @@
 
 
 module testbench();
-	reg clock, reset, wr_en;
+	reg clock, nrst, wr_en;
 	reg done_learnCost;
 
     // MEMORY MODULE
@@ -45,41 +45,42 @@ module testbench();
    
     // amISink MODULE
     reg [`WORD_WIDTH-1:0] MY_NODE_ID;
-    wire forAggregation, done_iamSink;
-    amISink ais1(clock, reset, done_learnCost, addr_1, mem_data_out, MY_NODE_ID, forAggregation, done_iamSink);
+    wire forAggregation1, done_iamSink;
+    amISink ais1(clock, nrst, done_learnCost, addr_1, mem_data_out, MY_NODE_ID, forAggregation1, done_iamSink);
   
     //amIForwarding MODULE
     reg [`WORD_WIDTH-1:0] destinationID;
     wire iamForwarding, done_iamForwarding;
-    amIForwarding aif1(clock, reset, done_iamSink, MY_NODE_ID, destinationID, iamForwarding, done_iamForwarding);
+    amIForwarding aif1(clock, nrst, done_iamSink, MY_NODE_ID, destinationID, iamForwarding, done_iamForwarding);
 	
     //fixSinkList MODULE
     //wire forAggregation, done_fixSinkList;
-	//fixSinkList fsl1(clock, reset, done_iamForwarding, addr_2, mem_data_out, done_fixSinkList);
+	//fixSinkList fsl1(clock, nrst, done_iamForwarding, addr_2, mem_data_out, done_fixSinkList);
 
     //neighborSinkInOtherCluster MODULE
     reg [`WORD_WIDTH-1:0] MY_CLUSTER_ID;
-    wire done_neighborSinkInOtherCluster;
-    //neighborSinkInOtherCluster nsioc1(clock, reset, done_fixSinkList, addr_3, mem_data_out, MY_CLUSTER_ID, forAggregation, done_neighborSinkInOtherCluster);
-	neighborSinkInOtherCluster nsioc1(clock, reset, done_iamForwarding, addr_3, mem_data_out, MY_CLUSTER_ID, forAggregation, done_neighborSinkInOtherCluster);
+    wire forAggregation2, done_neighborSinkInOtherCluster;
+    //neighborSinkInOtherCluster nsioc1(clock, nrst, done_fixSinkList, addr_3, mem_data_out, MY_CLUSTER_ID, forAggregation, done_neighborSinkInOtherCluster);
+	neighborSinkInOtherCluster nsioc1(clock, nrst, done_iamForwarding, addr_3, mem_data_out, MY_CLUSTER_ID, forAggregation2, done_neighborSinkInOtherCluster);
 	
 	// findMyBest MODULE
 	//reg [`WORD_WIDTH-1:0] MY_BATTERY_STAT;
 	//wire [`WORD_WIDTH-1:0] mybest;
     //wire done_findMyBest;
-	//findMyBest fmb1(clock, reset, done_neighborSinkInOtherCluster, addr_4, mem_data_out, MY_BATTERY_STAT, mybest, done_findMyBest);
+	//findMyBest fmb1(clock, nrst, done_neighborSinkInOtherCluster, addr_4, mem_data_out, MY_BATTERY_STAT, mybest, done_findMyBest);
 
 	// betterNeighborsInMyCluster MODULE
 	//wire [`WORD_WIDTH-1:0] betterneighbors, besthop, bestvalue, bestneighborID, nextsinks;
     //wire done_betterNeighborsInMyCluster;
-	//betterNeighborsInMyCluster bnimc1(clock, reset, done_findMyBest, addr_5, mem_data_out, MY_CLUSTER_ID, mybest, betterneighbors, besthop, bestvalue, bestneighborID, nextsinks, done_betterNeighborsInMyCluster);
+	//betterNeighborsInMyCluster bnimc1(clock, nrst, done_findMyBest, addr_5, mem_data_out, MY_CLUSTER_ID, mybest, betterneighbors, besthop, bestvalue, bestneighborID, nextsinks, done_betterNeighborsInMyCluster);
 	
     // winnerPolicy MODULE
 
 
     // selectMyAction MODULE
     //wire [`WORD_WIDTH-1:0] action;
-    //selectMyAction sma1(clock, reset, done_winnerPolicy, nexthop, nextsinks, action, forAggregation, done_selectMyAction);
+    // wire forAggregation3, done_selectMyAction;
+    //selectMyAction sma1(clock, nrst, done_winnerPolicy, nexthop, nextsinks, action, forAggregation3, done_selectMyAction);
 
 	// Clock
 	initial begin
@@ -87,10 +88,17 @@ module testbench();
 		forever #10 clock = ~clock;
 	end
 
+    // Reset
+    initial begin
+        nrst = 1;
+        #5 nrst = ~nrst;
+        #25 nrst = ~nrst;
+    end
+
     // MY_NODE_ID, destinationID, MY_CLUSTER_ID
     initial begin
     	done_learnCost <= 1;
-    	MY_NODE_ID <= 3;
+    	MY_NODE_ID <= 4;
     	destinationID <= 3;
     	MY_CLUSTER_ID <= 1;
     end
@@ -128,41 +136,19 @@ module testbench();
     end
 
     always @ (done_iamSink or done_iamForwarding or done_neighborSinkInOtherCluster) begin
-        if (done_iamSink && forAggregation) begin
-            reset = 1;
-            #10
-            reset = 0;
+        if (done_iamSink && forAggregation1) begin
+            nrst = ~nrst;
+            #25 nrst = ~nrst;
         end
         if (done_iamForwarding && !iamForwarding) begin
-            reset = 1;
-            #10
-            reset = 0;
+            nrst = ~nrst;
+            #25 nrst = ~nrst;
         end
-        if (done_neighborSinkInOtherCluster && forAggregation) begin
-            reset = 1;
-            #10
-            reset = 0;
+        if (done_neighborSinkInOtherCluster && forAggregation2) begin
+            nrst = ~nrst;
+            #25 nrst = ~nrst;
         end
     end    
-/*
-    always @ (done_iamForwarding or done_neighborSinkInOtherCluster) begin
-        if (done_iamForwarding && !iamForwarding) begin
-            reset = 1;
-            #10
-            reset = 0;
-        end
-        if (done_neighborSinkInOtherCluster && forAggregation) begin
-            reset = 1;
-            #10
-            reset = 0;
-        end
-        if (done_selectMyAction && forAggregation) begin
-            reset = 1;
-            #10
-            reset = 0;
-        end
-    end
-//*/    
 /*
 	// Memory testbench
 	

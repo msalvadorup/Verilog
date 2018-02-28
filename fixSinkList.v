@@ -3,8 +3,8 @@
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
-module fixSinkList(clock, reset, start, address, data_in, done);
-	input clock, reset, start;
+module fixSinkList(clock, nrst, start, address, data_in, done);
+	input clock, nrst, start;
 	input [`WORD_WIDTH-1:0] data_in;
     output done;
     output [`WORD_WIDTH-1:0] address;
@@ -23,7 +23,7 @@ module fixSinkList(clock, reset, start, address, data_in, done);
         j <= 0;        
     end
 
-    always @ (posedge reset) begin
+    always @ (posedge nrst) begin
         done_buf <= 0;
         address_count <= 16'h0;
         state <= 0;

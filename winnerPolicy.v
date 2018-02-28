@@ -3,8 +3,8 @@
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
-module winnerPolicy(clock, reset, _mybest, _besthop, _bestvalue, address, data_in, _bestneighborID, nexthop, done);
-    input clock, reset;
+module winnerPolicy(clock, nrst, _mybest, _besthop, _bestvalue, address, data_in, _bestneighborID, nexthop, done);
+    input clock, nrst;
     input [`WORD_WIDTH-1:0] _mybest;
     input [`WORD_WIDTH-1:0] _besthop;
     input [`WORD_WIDTH-1:0] _bestvalue;
@@ -20,8 +20,8 @@ module winnerPolicy(clock, reset, _mybest, _besthop, _bestvalue, address, data_i
     reg [`WORD_WIDTH-1:0] nexthop;
 
 
-    // Initial / Reset
-    always @ (posedge reset) begin
+    // Initial / nrst
+    always @ (posedge nrst) begin
         nexthop <= 100;     // For the lack of negative number representaion, let's use 100 as -1 
 
         //  Call Randomizer

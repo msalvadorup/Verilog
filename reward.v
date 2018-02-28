@@ -4,8 +4,8 @@
 `define WORD_WIDTH 16
 `define CLOCK_PD 20
 
-module reward(clock, reset, _action, _besthop, address, data_in, data_out, MY_NODE_ID, MY_CLUSTER_ID, done_prev, done);
-    input clock, reset;
+module reward(clock, nrst, _action, _besthop, address, data_in, data_out, MY_NODE_ID, MY_CLUSTER_ID, done_prev, done);
+    input clock, nrst;
     input [`WORD_WIDTH-1:0] _action;
     input [`WORD_WIDTH-1:0] _besthop;
 
@@ -41,8 +41,8 @@ module reward(clock, reset, _action, _besthop, address, data_in, data_out, MY_NO
     // Address Buffer
     reg [`WORD_WIDTH-1:0] address_count;
 
-    // Reset
-    always @ (posedge reset) begin
+    // nrst
+    always @ (posedge nrst) begin
         done_buf <= 0;
         data_out_buf <= 0;
     end
