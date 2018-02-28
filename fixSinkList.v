@@ -11,74 +11,58 @@ module fixSinkList(clock, nrst, start, address, data_in, done);
 
     // Registers
     reg done_buf;
-    reg [`WORD_WIDTH-1:0] address_count, i, j;
-    reg [`WORD_WIDTH-1:0] knownSinks, worstHops, sinkIDs, qValue, ;
+    reg [`WORD_WIDTH-1:0] address_count, i, j, l;
+    reg [`WORD_WIDTH-1:0] knownSinks, worstHops, sinkIDs, qValue, neighborCount, knownSinksCount, sinkIDsCount;
     reg [2:0] state;
 
-    initial begin
-        done_buf <= 0;
-        address_count <= 16'h48;
-        state <= 0;
-        i <= 0;
-        j <= 0;        
-    end
-
-    always @ (posedge nrst) begin
-        done_buf <= 0;
-        address_count <= 16'h0;
-        state <= 0;
-        i <= 0;
-        j <= 0;
-    end
-
     always @ (posedge clock) begin
-        if (start && !done_buf) begin
-        	case (state)
-                2'd0: begin
-                    // Read data_in from address_count = 16'h48 + 2*i 
-                    neighborID = data_in;
-                    state = 2'd1;
-                    address_count = 16'hC8 + 2*i;
+        if (!nrst) begin
+            done_buf <= 0;
+            address_count <= 16'h0000; // neighborCount address
+            state <= 0;
+            i <= 0;
+            j <= 0;
+            l <= 0;
+        end
+        else begin
+            if (start && !done_buf) begin
+                case (state)
+                0: begin
+                    neighborCount = data_in;
+                    state = 1;
+                    address_count = 16'h000000000; // knownSinksCount address
                 end
 
-                2'd1: begin
-                    // Read data_in from address_count = 16'hC8 + 2*i
-                    clusterID = data_in;
-                    state = 2'd2;
-                    address_count = 16'h8 + 2*j;
+                1: begin
+                    knownSinksCount = data_in;
+                    state = 2;
+                    address_count = 16'h00000 + 2*l; // sinkIDsCount address
                 end
 
-                2'd2: begin
-                    // Read data_in from address_count = 16'h8 + 2*j
+                2: begin
+                    sinkIDsCount = data_in;
+                    state = 3;
+                    address_count = 16'h8; // knownSinks address
+                end
+
+                3: begin
                     knownSinks = data_in;
-                    state = 2'd3;
+                    state = 4;
+                    address_count = 16'h0000 + 2*
                 end
 
-                2'd3: begin
-                    // Find neighbor[i] in knownSinks!
-                    // If there are neighbor sinks in other clusters, schedule aggregation!
-                    $display("%d,%d,%d,%d,%d", neighborID, clusterID, knownSinks, i, j);
-                    if ((neighborID == knownSinks) && (clusterID != MY_CLUSTER_ID)) begin
-                        forAggregation_buf = 1;
-                        done_buf = 1;
+                4: begin
+                    if (knownSinks == sinkIDs) begin
+
                     end
 
-                    j = j + 1;
-                    state = 2'd2;
-                    address_count = 16'h8 + 2*j; 
+                    if (j == knownSinksCount) begin
 
-                    if (j == 16) begin
-                        j = 0;
-                        i = i + 1;
-                        state = 2'd0;
-                        address_count = 16'h48 + 2*i;
                     end
 
-                    if (i == 64) begin
-                        done_buf = 1;
-                        // $display("I'm done");
-                    end
+                    if 
                 end
+
             endcase
         end
     end
@@ -86,3 +70,5 @@ module fixSinkList(clock, nrst, start, address, data_in, done);
     assign address = address_count;
 
 endmodule
+
+
