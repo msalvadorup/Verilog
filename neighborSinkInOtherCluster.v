@@ -9,15 +9,15 @@
  * 2: Get knownSinks and determine forAggregation flag
  */
 
-module neighborSinkInOtherCluster(clock, nrst, start, address, data_in, MY_CLUSTER_ID, forAggregation, done);
+module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, MY_CLUSTER_ID, data_out, forAggregation, done);
 	input clock, nrst, start;
 	input [`WORD_WIDTH-1:0] data_in, MY_CLUSTER_ID;
-	output forAggregation, done;
-	output [`WORD_WIDTH-1:0] address;
+	output forAggregation, done, wr_en;
+	output [`WORD_WIDTH-1:0] address, data_out;
 
 	// Registers
-	reg forAggregation_buf, done_buf;
-	reg [`WORD_WIDTH-1:0] address_count, i, j;
+	reg forAggregation_buf, done_buf, wr_en_buf;
+	reg [`WORD_WIDTH-1:0] address_count, data_out_buf, i, j;
 	reg [`WORD_WIDTH-1:0] neighborID, clusterID, knownSinks;
 	reg [2:0] state;
 	 
@@ -25,6 +25,7 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, data_in, MY_CLUST
 		if (!nrst) begin
 			forAggregation_buf <= 0;
 			done_buf <= 0;
+			wr_en_buf <= 0;
 			address_count <= 16'h48; // neighborID address
 			state <= 0;
 			i <= 0;
@@ -54,7 +55,6 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, data_in, MY_CLUST
 
 				3: begin
 					knownSinks = data_in;
-
 					// If there are neighbor sinks in other clusters, schedule aggregation!
 					$display("%d,%d,%d,%d,%d", neighborID, clusterID, knownSinks, i, j);
 					if ((neighborID == knownSinks) && (clusterID != MY_CLUSTER_ID)) begin
@@ -72,24 +72,34 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, data_in, MY_CLUST
 						address_count = 16'h48 + 2*i; // neighborID address
 					end
 
-					if (i == 64) begin
-						state = 4;
-					end
+					if (i == 64)
+						state = 5;
 
-					if (forAggregation_buf)
+					if (forAggregation_buf) begin
 						state = 4;
+						data_out_buf = 16'h1;
+						address_count = 16'h2; // forAggregation (FLAG) address
+						wr_en_buf = 1;
+					end
 				end
 
 				4: begin
+					wr_en_buf = 0;
+					state = 5;
+				end
+
+				5: begin
 					done_buf = 1;
 				end
 				
-				default: state = 4;    
+				default: state = 5;    
 			endcase
 		end
 	end
 	
 	assign done = done_buf;
 	assign address = address_count;
+	assign wr_en = wr_en_buf;
+	assign data_out = data_out_buf;
 	assign forAggregation = forAggregation_buf;
 endmodule

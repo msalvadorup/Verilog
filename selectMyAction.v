@@ -10,21 +10,22 @@
  * self (CH role)
  */
 
-module selectMyAction(clock, nrst, start, nexthop, nextsinks, action, forAggregation, done);
+module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, action, data_out, forAggregation, done);
 	input clock, nrst, start;
 	input [`WORD_WIDTH-1:0] nexthop, nextsinks;
-	output forAggregation, done;
-	output [`WORD_WIDTH-1:0] action;
+	output forAggregation, done, wr_en;
+	output [`WORD_WIDTH-1:0] action, address, data_out;
 
 	// Registers
-	reg forAggregation_buf, done_buf;
-	reg [`WORD_WIDTH-1:0] action_buf;
-	reg [1:0];
+	reg forAggregation_buf, done_buf, wr_en_buf;
+	reg [`WORD_WIDTH-1:0] action_buf, address_count, data_out_buf;
+	reg [1:0] state;
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
 			done_buf <= 0;
 			action_buf <= nexthop;
+			state <= 0;
 		end
 		else begin
 			case (state)
@@ -39,27 +40,38 @@ module selectMyAction(clock, nrst, start, nexthop, nextsinks, action, forAggrega
 						action_buf = nextsinks;
 						//$display("Send pkt to neighbor sink in my cluster!");
 					end
-					else state = 2;
+					else state = 3;
 
 					if (action_buf == 65) begin
 						forAggregation_buf = 1;
+						state = 2;
+						data_out_buf = 16'h1;
+						address_count = 16'h2; // forAggregation (FLAG) address
+						wr_en_buf = 1;
 						//$display("No better in-cluster head. Schedule aggregation!");
 					end
 					else forAggregation_buf = 0;
 
-					state = 2;
+					state = 3;
 				end
 
 				2: begin
-					done_buf = 1;
+					wr_en_buf = 0;
+					state = 3;
 				end
 
-				default: state = 2;
+				3: begin
+					done_buf = 1;	
+				end
+				default: state = 3;
 			endcase
 		end
 	end
 
 	assign done = done_buf;
+	assign address = address_count;
+	assign wr_en = wr_en_buf;
+	assign data_out = data_out_buf;
 	assign forAggregation = forAggregation_buf;
 	assign action = action_buf;
 endmodule

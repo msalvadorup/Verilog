@@ -15,7 +15,7 @@ cost = [5, 3.5, 2.7, 2.2, 1.8, 1.6, 1.4, 1.3, 1.2, 1.1, 1.0]
 
 # NODE GLOBAL VARIABLES
 epsilon = 0.5
-epsilon_step =0.1
+epsilon_step = 0.1
 initial_epsilon = epsilon
 
 # EXTRACTED FEEDBACK INFO FROM MESSAGE

@@ -8,7 +8,7 @@
  * 0: Find mybest
  * 1: Compute full mybest
  * 
- * NOte: Gagawin pang float yung mga values
+ * NOte: Gagawin pang fixed-point yung mga values
  */
 
 module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest, done);
@@ -16,24 +16,24 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 	input [`WORD_WIDTH-1:0] data_in, MY_BATTERY_STAT;
 	output done;
 	output [`WORD_WIDTH-1:0] address;
-	output [`WORD_WIDTH-1:0] mybest; // float
+	output [`WORD_WIDTH-1:0] mybest; // fixed-point
 
 	// Registers
 	reg done_buf;
 	reg [`WORD_WIDTH-1:0] address_count, k;
-	reg [`WORD_WIDTH-1:0] mybest_buf; // float
+	reg [`WORD_WIDTH-1:0] mybest_buf, qValue; // fixed-point
 	reg [1:0] state;
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
 			done_buf <= 0;
 			address_count <= 16'h1C8; // qValue address
-			mybest_buf <= 16'hFFFE; // float
+			mybest_buf <= 16'hFFFE; // fixed-point
 			state <= 0;
 			k <= 0;
 		end
 		else begin
-			case (state) begin
+			case (state)
 				0: begin
 					if (start) begin
 						state = 1;
@@ -43,22 +43,25 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 				end
 
 				1: begin
-					if (data_in < mybest_buf) begin
-						mybest_buf = data_in;
+					qValue = data_in;
+					if (qValue < mybest_buf) begin // fixed-point comparison
+						mybest_buf = qValue;
 					end
 
 					if (address_count == 16'h246) begin
 						state = 2;
-						k = $ceil((`HCM_LENGTH-1) * MY_BATTERY_STAT); // float multiplication
+						k = $ceil((`HCM_LENGTH-1) * MY_BATTERY_STAT); // fixed-point multiplication
+
 						if (k >= `HCM_LENGTH)
 							k = `HCM_LENGTH - 1;
+
 						address_count = 16'h648 + 2*k; // HCM address
 					end
 					else address_count = address_count + 2; // qValue address
 				end
 
 				2: begin
-					mybest_buf = mybest_buf * data_in; // float multiplication
+					mybest_buf = mybest_buf * data_in; // fixed-point multiplication
 					state = 3;
 				end
 

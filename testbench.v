@@ -34,12 +34,11 @@
 
 
 module testbench();
-	reg clock, nrst, wr_en;
+	reg clock, nrst;
 	reg done_learnCost;
-
+	wire wr_en;
 	// MEMORY MODULE
-	reg [`WORD_WIDTH-1:0] mem_data_in; 
-	wire [`WORD_WIDTH-1:0] mem_data_out; 
+	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
 	wire [`WORD_WIDTH-1:0] address;
 	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);
 	
@@ -50,7 +49,7 @@ module testbench();
    
 	// amISink MODULE
 	wire forAggregation1, done_iamSink;
-	amISink ais1(clock, nrst, done_learnCost, addr_1, mem_data_out, forAggregation1, done_iamSink);
+	amISink ais1(clock, nrst, done_learnCost, addr_1, wr_en, mem_data_out, mem_data_in, forAggregation1, done_iamSink);
   
 	//amIForwarding MODULE
 	reg [`WORD_WIDTH-1:0] MY_NODE_ID, destinationID;
@@ -65,7 +64,7 @@ module testbench();
 	reg [`WORD_WIDTH-1:0] MY_CLUSTER_ID;
 	wire forAggregation2, done_neighborSinkInOtherCluster;
 	//neighborSinkInOtherCluster nsioc1(clock, nrst, done_fixSinkList, addr_3, mem_data_out, MY_CLUSTER_ID, forAggregation, done_neighborSinkInOtherCluster);
-	neighborSinkInOtherCluster nsioc1(clock, nrst, done_iamForwarding, addr_3, mem_data_out, MY_CLUSTER_ID, forAggregation2, done_neighborSinkInOtherCluster);
+	neighborSinkInOtherCluster nsioc1(clock, nrst, done_iamForwarding, addr_3, wr_en, mem_data_out, MY_CLUSTER_ID, mem_data_in, forAggregation2, done_neighborSinkInOtherCluster);
 	
 	// findMyBest MODULE
 	//reg [`WORD_WIDTH-1:0] MY_BATTERY_STAT;
@@ -84,7 +83,7 @@ module testbench();
 	// selectMyAction MODULE
 	//wire [`WORD_WIDTH-1:0] action;
 	// wire forAggregation3, done_selectMyAction;
-	//selectMyAction sma1(clock, nrst, done_winnerPolicy, nexthop, nextsinks, action, forAggregation3, done_selectMyAction);
+	//selectMyAction sma1(clock, nrst, done_winnerPolicy, addr_7, wr_en, nexthop, nextsinks, action, mem_data_in, forAggregation3, done_selectMyAction);
 
 	// Clock
 	initial begin
