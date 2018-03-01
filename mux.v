@@ -23,16 +23,16 @@ module mux(select, out, in0, in1, in2, in3, in4, in5, in6, in7);
 	reg [`WORD_WIDTH-1:0] out_buf;
 
 	always @(*) begin
-	   case(select)
-	       0 : out_buf = in0;
-	       1 : out_buf = in1;
-	       2 : out_buf = in2;
-	       3 : out_buf = in3;
-	       4 : out_buf = in4;
-	       5 : out_buf = in5;
-	       6 : out_buf = in6;
-	       7 : out_buf = in7;
-	   endcase
+		case(select)
+			0 : out_buf = in0;
+			1 : out_buf = in1;
+			2 : out_buf = in2;
+			3 : out_buf = in3;
+			4 : out_buf = in4;
+			5 : out_buf = in5;
+			6 : out_buf = in6;
+			7 : out_buf = in7;
+		endcase
 	end
 	assign out = out_buf;
 endmodule

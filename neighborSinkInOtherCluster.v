@@ -12,76 +12,84 @@
 module neighborSinkInOtherCluster(clock, nrst, start, address, data_in, MY_CLUSTER_ID, forAggregation, done);
 	input clock, nrst, start;
 	input [`WORD_WIDTH-1:0] data_in, MY_CLUSTER_ID;
-    output forAggregation, done;
-    output [`WORD_WIDTH-1:0] address;
+	output forAggregation, done;
+	output [`WORD_WIDTH-1:0] address;
 
-    // Registers
-    reg forAggregation_buf, done_buf;
-    reg [`WORD_WIDTH-1:0] address_count, i, j;
-    reg [`WORD_WIDTH-1:0] neighborID, clusterID, knownSinks;
-    reg [1:0] state;
-     
-    always @ (posedge clock) begin
-        if (!nrst) begin
-            forAggregation_buf <= 0;
-            done_buf <= 0;
-            address_count <= 16'h48; // neighborID address
-            state <= 0;
-            i <= 0;
-            j <= 0;
-        end
-        else begin
-            if (start && !done_buf) begin
-            //Sa next state pa mareread yung address na sinet mo sa current state
-                case (state)
-                    2'd0: begin
-                        // Read data_in from address_count = 16'h48 + 2*i; 
-                        neighborID = data_in;
-                        state = 2'd1;
-                        address_count = 16'hC8 + 2*i; // clusterID address
-                    end
+	// Registers
+	reg forAggregation_buf, done_buf;
+	reg [`WORD_WIDTH-1:0] address_count, i, j;
+	reg [`WORD_WIDTH-1:0] neighborID, clusterID, knownSinks;
+	reg [2:0] state;
+	 
+	always @ (posedge clock) begin
+		if (!nrst) begin
+			forAggregation_buf <= 0;
+			done_buf <= 0;
+			address_count <= 16'h48; // neighborID address
+			state <= 0;
+			i <= 0;
+			j <= 0;
+		end
+		else begin
+			case (state)
+				0: begin
+					if (start) begin
+						state = 1;
+						address_count = 16'h48; // neighborID address
+					end
+					else state = 0;
+				end
 
-                    2'd1: begin
-                        // Read data_in from address_count = 16'hC8 + 2*i;
-                        clusterID = data_in;
-                        state = 2'd2;
-                        address_count = 16'h8 + 2*j; // knownSinks address
-                    end
+				1: begin
+					neighborID = data_in;
+					state = 2;
+					address_count = 16'hC8 + 2*i; // clusterID address
+				end
 
-                    2'd2: begin
-                        // Read data_in from address_count = 16'h8 + 2*j;
-                        knownSinks = data_in;
+				2: begin
+					clusterID = data_in;
+					state = 3;
+					address_count = 16'h8 + 2*j; // knownSinks address
+				end
 
-                        // Find neighbor[i] in knownSinks!
-                        // If there are neighbor sinks in other clusters, schedule aggregation!
-                        $display("%d,%d,%d,%d,%d", neighborID, clusterID, knownSinks, i, j);
-                        if ((neighborID == knownSinks) && (clusterID != MY_CLUSTER_ID)) begin
-                            forAggregation_buf = 1;
-                            done_buf = 1;
-                            // Toggle nrst
-                        end
+				3: begin
+					knownSinks = data_in;
 
-                        j = j + 1;
-                        address_count = 16'h8 + 2*j; // knownSinks address
+					// If there are neighbor sinks in other clusters, schedule aggregation!
+					$display("%d,%d,%d,%d,%d", neighborID, clusterID, knownSinks, i, j);
+					if ((neighborID == knownSinks) && (clusterID != MY_CLUSTER_ID)) begin
+						forAggregation_buf = 1;
+					end
+					else forAggregation_buf = 0;
 
-                        if (j == 16) begin
-                            j = 0;
-                            i = i + 1;
-                            state = 2'd0;
-                            address_count = 16'h48 + 2*i; // neighborID address
-                        end
+					j = j + 1;
+					address_count = 16'h8 + 2*j; // knownSinks address
 
-                        if (i == 64) begin
-                            done_buf = 1;
-                            //$display("I'm done");
-                        end
-                    end
-                endcase
-            end
-        end        
-    end
-    
-    assign done = done_buf;
-    assign address = address_count;
-    assign forAggregation = forAggregation_buf;
+					if (j == 16) begin
+						j = 0;
+						i = i + 1;
+						state = 1;
+						address_count = 16'h48 + 2*i; // neighborID address
+					end
+
+					if (i == 64) begin
+						state = 4;
+					end
+
+					if (forAggregation_buf)
+						state = 4;
+				end
+
+				4: begin
+					done_buf = 1;
+				end
+				
+				default: state = 4;    
+			endcase
+		end
+	end
+	
+	assign done = done_buf;
+	assign address = address_count;
+	assign forAggregation = forAggregation_buf;
 endmodule
