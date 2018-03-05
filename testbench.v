@@ -23,7 +23,7 @@
 
 `include "memory.v"
 `include "mux.v"
-//`include "demux.v"
+`include "mux_1bit.v"
 `include "amISink.v"
 `include "amIForwarding.v"
 `include "fixSinkList.v"
@@ -44,12 +44,19 @@ module testbench();
 	
 	// MUX MODULE
 	reg [2:0] addr_select;
+	
 	wire [`WORD_WIDTH-1:0] addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7;
 	mux addr_mux(addr_select, address, addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7);
+
+	wire [`WORD_WIDTH-1:0] mdi_0, mdi_1, mdi_2, mdi_3, mdi_4, mdi_5, mdi_6, mdi_7;
+	mux mdi_mux(addr_select, mem_data_in, mdi_0, mdi_1, mdi_2, mdi_3, mdi_4, mdi_5, mdi_6, mdi_7);
+	
+	wire wren_0, wren_1, wren_2, wren_3, wren_4, wren_5, wren_6, wren_7;
+	mux_1bit wren_mux(addr_select, wr_en, wren_0, wren_1, wren_2, wren_3, wren_4, wren_5, wren_6, wren_7);
    
 	// amISink MODULE
 	wire forAggregation1, done_iamSink;
-	amISink ais1(clock, nrst, done_learnCost, addr_1, wr_en, mem_data_out, mem_data_in, forAggregation1, done_iamSink);
+	amISink ais1(clock, nrst, done_learnCost, addr_1, wren_1, mem_data_out, mdi_1, forAggregation1, done_iamSink);
   
 	//amIForwarding MODULE
 	reg [`WORD_WIDTH-1:0] MY_NODE_ID, destinationID;
@@ -64,7 +71,7 @@ module testbench();
 	reg [`WORD_WIDTH-1:0] MY_CLUSTER_ID;
 	wire forAggregation2, done_neighborSinkInOtherCluster;
 	//neighborSinkInOtherCluster nsioc1(clock, nrst, done_fixSinkList, addr_3, mem_data_out, MY_CLUSTER_ID, forAggregation, done_neighborSinkInOtherCluster);
-	neighborSinkInOtherCluster nsioc1(clock, nrst, done_iamForwarding, addr_3, wr_en, mem_data_out, MY_CLUSTER_ID, mem_data_in, forAggregation2, done_neighborSinkInOtherCluster);
+	neighborSinkInOtherCluster nsioc1(clock, nrst, done_iamForwarding, addr_3, wren_3, mem_data_out, MY_CLUSTER_ID, mdi_3, forAggregation2, done_neighborSinkInOtherCluster);
 	
 	// findMyBest MODULE
 	//reg [`WORD_WIDTH-1:0] MY_BATTERY_STAT;
@@ -75,7 +82,7 @@ module testbench();
 	// betterNeighborsInMyCluster MODULE
 	//wire [`WORD_WIDTH-1:0] betterneighbors, besthop, bestvalue, bestneighborID, nextsinks;
 	//wire done_betterNeighborsInMyCluster;
-	//betterNeighborsInMyCluster bnimc1(clock, nrst, done_findMyBest, addr_5, mem_data_out, MY_CLUSTER_ID, mybest, betterneighbors, besthop, bestvalue, bestneighborID, nextsinks, done_betterNeighborsInMyCluster);
+	//betterNeighborsInMyCluster bnimc1(clock, nrst, done_findMyBest, addr_5, mem_data_out, MY_CLUSTER_ID, mybest, betterneighbors, besthop, bestvalue, bestneighborID, nextsinks, men_data_in, done_betterNeighborsInMyCluster);
 	
 	// winnerPolicy MODULE
 

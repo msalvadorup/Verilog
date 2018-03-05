@@ -58,7 +58,7 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h68A] = 0;
 		memory['h68A+1] = 4;
 
-		// neighborSinkInOtherCluster
+		/* neighborSinkInOtherCluster test case
 
 		// neighborID
 		memory['h48 + 0] = 0;
@@ -73,7 +73,6 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h48 + 6] = 0;
 		memory['h48 + 7] = 6;		
 
-
 		// clusterID
 		memory['hC8 + 0] = 0;
 		memory['hC8 + 1] = 1;
@@ -86,7 +85,7 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 		memory['hC8 + 6] = 0;
 		memory['hC8 + 7] = 3;
-
+		//*/
 	end
 
 	//READ PORT
