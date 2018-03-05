@@ -72,7 +72,7 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 					$display("%d,%d,%d,%d,%d", neighborID, clusterID, knownSinks, i, j);
 					if ((neighborID == knownSinks) && (clusterID != MY_CLUSTER_ID)) begin
 						forAggregation_buf = 1;
-						//$display("There are neighbor sinks in other clusters!,%d,%d,%d,%d", neighborID, clusterID, knownSinks, forAggregation_buf);
+						$display("There are neighbor sinks in other clusters!,%d,%d,%d,%d", neighborID, clusterID, knownSinks, forAggregation_buf);
 					end
 					else forAggregation_buf = 0;
 

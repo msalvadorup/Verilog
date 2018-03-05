@@ -58,20 +58,20 @@ module testbench();
 	wire forAggregation1, done_iamSink;
 	amISink ais1(clock, nrst, done_learnCost, addr_1, wren_1, mem_data_out, mdi_1, forAggregation1, done_iamSink);
   
-	//amIForwarding MODULE
+	// amIForwarding MODULE
 	reg [`WORD_WIDTH-1:0] MY_NODE_ID, destinationID;
 	wire iamForwarding, done_iamForwarding;
 	amIForwarding aif1(clock, nrst, done_iamSink, MY_NODE_ID, destinationID, iamForwarding, done_iamForwarding);
 	
-	//fixSinkList MODULE
-	//wire forAggregation, done_fixSinkList;
-	//fixSinkList fsl1(clock, nrst, done_iamForwarding, addr_2, wr_en, mem_data_out, done_fixSinkList);
+	// fixSinkList MODULE
+	wire done_fixSinkList;
+	fixSinkList fsl1(clock, nrst, done_iamForwarding, addr_2, wren_2, mem_data_out, mdi_2, done_fixSinkList);
 
-	//neighborSinkInOtherCluster MODULE
+	// neighborSinkInOtherCluster MODULE
 	reg [`WORD_WIDTH-1:0] MY_CLUSTER_ID;
 	wire forAggregation2, done_neighborSinkInOtherCluster;
-	//neighborSinkInOtherCluster nsioc1(clock, nrst, done_fixSinkList, addr_3, mem_data_out, MY_CLUSTER_ID, forAggregation, done_neighborSinkInOtherCluster);
-	neighborSinkInOtherCluster nsioc1(clock, nrst, done_iamForwarding, addr_3, wren_3, mem_data_out, MY_CLUSTER_ID, mdi_3, forAggregation2, done_neighborSinkInOtherCluster);
+	neighborSinkInOtherCluster nsioc1(clock, nrst, done_fixSinkList, addr_3, wren_3, mem_data_out, MY_CLUSTER_ID, mdi_3, forAggregation2, done_neighborSinkInOtherCluster);
+	//neighborSinkInOtherCluster nsioc1(clock, nrst, done_iamForwarding, addr_3, wren_3, mem_data_out, MY_CLUSTER_ID, mdi_3, forAggregation2, done_neighborSinkInOtherCluster);
 	
 	// findMyBest MODULE
 	//reg [`WORD_WIDTH-1:0] MY_BATTERY_STAT;
@@ -138,8 +138,17 @@ module testbench();
 			addr_select <= 7;
 		end
 		//*/
-		//*
+		/*
 		else if (done_iamForwarding && !done_neighborSinkInOtherCluster) begin
+			addr_select <= 3;
+		end
+		//*/
+
+		//*/
+		else if (done_iamForwarding && !done_fixSinkList) begin
+			addr_select <= 2;
+		end
+		else if (done_fixSinkList && !done_neighborSinkInOtherCluster) begin
 			addr_select <= 3;
 		end
 		//*/
