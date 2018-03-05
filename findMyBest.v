@@ -21,7 +21,7 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 	// Registers
 	reg done_buf;
 	reg [`WORD_WIDTH-1:0] address_count, k;
-	reg [`WORD_WIDTH-1:0] mybest_buf, qValue; // fixed-point
+	reg [`WORD_WIDTH-1:0] mybest_buf, qValue, HCM; // fixed-point
 	reg [1:0] state;
 
 	always @ (posedge clock) begin
@@ -61,6 +61,7 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 				end
 
 				2: begin
+					HCM = data_in;
 					mybest_buf = mybest_buf * data_in; // fixed-point multiplication
 					state = 3;
 				end
