@@ -10,16 +10,16 @@
  * self (CH role)
  */
 
-module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, action, data_out, forAggregation, done);
+module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, action, data_out, forAggregation, done, rng_in);
 	input clock, nrst, start;
-	input [`WORD_WIDTH-1:0] nexthop, nextsinks;
+	input [`WORD_WIDTH-1:0] nexthop, nextsinks, rng_out;
 	output forAggregation, done, wr_en;
 	output [`WORD_WIDTH-1:0] action, address, data_out;
 
 	// Registers
 	reg forAggregation_buf, done_buf, wr_en_buf;
-	reg [`WORD_WIDTH-1:0] action_buf, address_count, data_out_buf;
-	reg [1:0] state;
+	reg [`WORD_WIDTH-1:0] action_buf, address_count, data_out_buf, rng_in_buf;
+	reg [2:0] state;
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
@@ -58,12 +58,19 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 				2: begin
 					wr_en_buf = 0;
 					state = 3;
+					rng_in_buf <= rng_out;
+					address_count <= 16'h7FE;
 				end
 
 				3: begin
+					wr_en_buf <= 1;
+					state <= 4;
+				end
+				4: begin
+					wr_en_buf <= 0;
 					done_buf = 1;	
 				end
-				default: state = 3;
+				default: state <= 5;
 			endcase
 		end
 	end
