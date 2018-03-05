@@ -68,7 +68,8 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 					neighborCount = data_in;
 					state = 3;
 					address_count = 16'hC8; // clusterID address
-
+				end
+				
 				3: begin
 					clusterID = data_in;
 
