@@ -18,7 +18,7 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 	// Registers
 	reg forAggregation_buf, done_buf, wr_en_buf;
 	reg [`WORD_WIDTH-1:0] address_count, data_out_buf, i, j;
-	reg [`WORD_WIDTH-1:0] neighborID, clusterID, knownSinks;
+	reg [`WORD_WIDTH-1:0] knownSinkCount, neighborCount, neighborID, clusterID, knownSinks;
 	reg [2:0] state;
 	 
 	always @ (posedge clock) begin
@@ -26,7 +26,7 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 			forAggregation_buf <= 0;
 			done_buf <= 0;
 			wr_en_buf <= 0;
-			address_count <= 16'h48; // neighborID address
+			address_count <= 16'h688; // knownSinkCount address
 			state <= 0;
 			i <= 0;
 			j <= 0;
@@ -36,24 +36,37 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 				0: begin
 					if (start) begin
 						state = 1;
-						address_count = 16'h48; // neighborID address
+						address_count = 16'h688; // knownSinkCount address
 					end
 					else state = 0;
 				end
 
 				1: begin
-					neighborID = data_in;
+					knownSinkCount = data_in;
 					state = 2;
-					address_count = 16'hC8 + 2*i; // clusterID address
+					address_count = 16'h68A; // neighborCount address
 				end
 
 				2: begin
-					clusterID = data_in;
+					neighborCount = data_in;
 					state = 3;
-					address_count = 16'h8 + 2*j; // knownSinks address
+					address_count = 16'h48; //neighborID address
+
 				end
 
 				3: begin
+					neighborID = data_in;
+					state = 4;
+					address_count = 16'hC8 + 2*i; // clusterID address
+				end
+
+				4: begin
+					clusterID = data_in;
+					state = 5;
+					address_count = 16'h8 + 2*j; // knownSinks address
+				end
+
+				5: begin
 					knownSinks = data_in;
 					// If there are neighbor sinks in other clusters, schedule aggregation!
 					$display("%d,%d,%d,%d,%d", neighborID, clusterID, knownSinks, i, j);
@@ -65,34 +78,34 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 					j = j + 1;
 					address_count = 16'h8 + 2*j; // knownSinks address
 
-					if (j == 16) begin
+					if (j == knownSinkCount) begin
 						j = 0;
 						i = i + 1;
-						state = 1;
+						state = 3;
 						address_count = 16'h48 + 2*i; // neighborID address
 					end
 
-					if (i == 64)
-						state = 5;
+					if (i == neighborCount)
+						state = 7;
 
 					if (forAggregation_buf) begin
-						state = 4;
+						state = 6;
 						data_out_buf = 16'h1;
 						address_count = 16'h2; // forAggregation (FLAG) address
 						wr_en_buf = 1;
 					end
 				end
 
-				4: begin
+				6: begin
 					wr_en_buf = 0;
-					state = 5;
+					state = 7;
 				end
 
-				5: begin
+				7: begin
 					done_buf = 1;
 				end
 				
-				default: state = 5;    
+				default: state = 7;    
 			endcase
 		end
 	end
