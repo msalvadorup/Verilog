@@ -72,6 +72,7 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 					$display("%d,%d,%d,%d,%d", neighborID, clusterID, knownSinks, i, j);
 					if ((neighborID == knownSinks) && (clusterID != MY_CLUSTER_ID)) begin
 						forAggregation_buf = 1;
+						$display("There are neighbor sinks in other clusters!,%d,%d,%d,%d", neighborID, clusterID, knownSinks, forAggregation_buf);
 					end
 					else forAggregation_buf = 0;
 
@@ -93,16 +94,19 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 						data_out_buf = 16'h1;
 						address_count = 16'h2; // forAggregation (FLAG) address
 						wr_en_buf = 1;
+						$display("pumasok");
 					end
 				end
 
 				6: begin
 					wr_en_buf = 0;
 					state = 7;
+					$display("nagwrite ako");
 				end
 
 				7: begin
 					done_buf = 1;
+					//$display("done");
 				end
 				
 				default: state = 7;    

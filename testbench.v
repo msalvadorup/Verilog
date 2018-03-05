@@ -147,10 +147,12 @@ module testbench();
 			nrst = ~nrst;
 			#25 nrst = ~nrst;
 		end
+		/*
 		if (done_neighborSinkInOtherCluster && forAggregation2) begin
 			nrst = ~nrst;
 			#25 nrst = ~nrst;
 		end
+		*/
 	end    
 /*
 	// Memory testbench
