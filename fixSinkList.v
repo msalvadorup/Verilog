@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`define MEM_DEPTH  1024
+`define MEM_DEPTH  2048
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
@@ -18,6 +18,7 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 	always @ (posedge clock) begin
 		if (!nrst) begin
 			done_buf <= 0;
+			wr_en_buf <= 0;
 			address_count <= 16'h68A; // neighborCount address
 			state <= 0;
 			i <= 0; // qValue, sinkIDCount
@@ -29,7 +30,7 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 				0: begin
 					if (start) begin
 						state = 1;
-						address_count <= 16'h68A; // neighborCount address
+						address_count = 16'h68A; // neighborCount address
 					end
 					else state = 0;
 				end
@@ -43,7 +44,7 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 				2: begin
 					knownSinkCount = data_in;
 					state = 3;
-					address_count = 16'h8; // knownSinks address
+					address_count = 16'h8 + 2*j; // knownSinks address
 				end
 
 				3: begin
@@ -71,11 +72,11 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 							k = 0;
 							
 							if (j == knownSinkCount) begin
-								state = 10;
+								state = 11;
 							end
 							else begin
 								state = 3;
-								address_count = 16'h8; // knownSinks address
+								address_count = 16'h8 + 2*j; // knownSinks address
 							end
 						end
 						else begin
@@ -89,14 +90,15 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 						if (k == sinkIDCount) begin
 							state = 6;  // Append knownSink to sinkIDs
 							data_out_buf = knownSinks;
-							// address_count = 16'h248 + 16*i + 2*k; // sinkIDs address
+							address_count = 16'h248 + 16*i + 2*k; // sinkIDs address
 							wr_en_buf = 1;
+							$display("Append knownSink to sinkIDs");
 						end
 						else begin
-							// state = 4;
+							// state = 5;
 							address_count = 16'h248 + 16*i + 2*k; // sinkIDs address
 						end
-					end                                  
+					end
 				end
 
 				6: begin
@@ -113,13 +115,21 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 
 				8: begin
 					qValue = data_in;
-					data_out_buf = qValue + (worstHops - 1); // Update qValue (add worstHops)
 					state = 9;
+					data_out_buf = qValue + (worstHops - 1); // Update qValue (add worstHops)
 					// address_count = 16'h1C8 + 2*i; // qValue address (write)
-					wr_en_buf = 1; 
+					wr_en_buf = 1;
 				end
 
 				9: begin
+					wr_en_buf = 0;
+					state = 10;
+					data_out_buf = sinkIDCount + 1;
+					address_count = 16'h68E + 2*i;
+					wr_en_buf = 1;
+				end
+
+				10: begin
 					wr_en_buf = 0;
 					i = i + 1; // Compare knownSink with next set of sinkIDs after append
 					k = 0;
@@ -130,11 +140,11 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 						k = 0;
 						
 						if (j == knownSinkCount) begin
-							state = 10;
+							state = 11;
 						end
 						else begin
 							state = 3;
-							address_count = 16'h8; // knownSinks address
+							address_count = 16'h8 + 2*j; // knownSinks address
 						end 
 					end
 					else begin
@@ -143,11 +153,11 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 					end 
 				end
 
-				10: begin
+				11: begin
 					done_buf = 1;
 				end
 
-				default: state = 10;
+				default: state = 11;
 			endcase
 		end
 	end

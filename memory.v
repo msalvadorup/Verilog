@@ -58,8 +58,102 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h68A] = 0;
 		memory['h68A+1] = 4;
 
-		// neighborSinkInOtherCluster
+		///* fixSinkList testcase
+		// neighborID
+		memory['h48 + 0] = 0;
+		memory['h48 + 1] = 1;
 
+		memory['h48 + 2] = 0;
+		memory['h48 + 3] = 3;
+
+		memory['h48 + 4] = 0;
+		memory['h48 + 5] = 4;
+
+		memory['h48 + 6] = 0;
+		memory['h48 + 7] = 6;
+		
+		// clusterID
+		memory['hC8 + 0] = 0;
+		memory['hC8 + 1] = 9;
+
+		memory['hC8 + 2] = 0;
+		memory['hC8 + 3] = 1;
+
+		memory['hC8 + 4] = 0;
+		memory['hC8 + 5] = 1;
+
+		memory['hC8 + 6] = 0;
+		memory['hC8 + 7] = 3;
+
+		// sinkIDsCount
+		memory['h68E + 0] = 0;
+		memory['h68E + 1] = 3;
+
+		memory['h68E + 2] = 0;
+		memory['h68E + 3] = 5;
+
+		memory['h68E + 4] = 0;
+		memory['h68E + 5] = 3;
+
+		memory['h68E + 6] = 0;
+		memory['h68E + 7] = 1;
+
+		// sinkIDs
+		memory['h248 + 0 + 0] = 0;
+		memory['h248 + 0 + 1] = 10;
+
+		memory['h248 + 0 + 2] = 0;
+		memory['h248 + 0 + 3] = 171;
+
+		memory['h248 + 0 + 4] = 0;
+		memory['h248 + 0 + 5] = 205;
+
+
+		memory['h248 + 16 + 0] = 0;
+		memory['h248 + 16 + 1] = 2;
+
+		memory['h248 + 16 + 2] = 0;
+		memory['h248 + 16 + 3] = 5;
+
+		memory['h248 + 16 + 4] = 0;
+		memory['h248 + 16 + 5] = 10;
+
+		memory['h248 + 16 + 6] = 0;
+		memory['h248 + 16 + 7] = 171;
+
+		memory['h248 + 16 + 8] = 0;
+		memory['h248 + 16 + 9] = 205;
+
+
+		memory['h248 + 32 + 0] = 0;
+		memory['h248 + 32 + 1] = 2;
+
+		memory['h248 + 32 + 2] = 0;
+		memory['h248 + 32 + 3] = 5;
+
+		memory['h248 + 32 + 4] = 0;
+		memory['h248 + 32 + 5] = 10;
+		
+
+		memory['h248 + 48 + 0] = 0;
+		memory['h248 + 48 + 1] = 2;
+
+		// qValue
+		memory['h1C8 + 0] = 0;
+		memory['h1C8 + 1] = 10;
+
+		memory['h1C8 + 2] = 0;
+		memory['h1C8 + 3] = 35;
+
+		memory['h1C8 + 4] = 0;
+		memory['h1C8 + 5] = 40;
+
+		memory['h1C8 + 6] = 0;
+		memory['h1C8 + 7] = 60;
+
+		//*/
+
+		/* neighborSinkInOtherCluster testcase
 		// neighborID
 		memory['h48 + 0] = 0;
 		memory['h48 + 1] = 3;
@@ -73,7 +167,6 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h48 + 6] = 0;
 		memory['h48 + 7] = 6;		
 
-
 		// clusterID
 		memory['hC8 + 0] = 0;
 		memory['hC8 + 1] = 1;
@@ -86,6 +179,7 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 		memory['hC8 + 6] = 0;
 		memory['hC8 + 7] = 3;
+		//*/
 
 	end
 

@@ -31,6 +31,16 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 	reg [`WORD_WIDTH-1:0] knownSinkCount, neighborCount, clusterID, neighborID, knownSinks, betterneighbors, betterneighborCount, besthop_buf, bestneighborID_buf, nextsinks_buf;
 	reg [`WORD_WIDTH-1:0] BATTERY_THRESHOLD, batteryStat, qValue, bestvalue_buf, HCM; // fixed-point
 	reg [3:0] state;
+	reg [31:0] fpTemp;
+	/**
+	
+		FIXED POINT:
+		- BATTERY_THRESHOLD 1./15
+		- batteryStat 1./15
+		- qValue 11./5
+		- bestvalue_buf 11./5
+		- HCM 3./13
+	 */
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
@@ -126,8 +136,10 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 				
 				7: begin
 					HCM = data_in;
-					qValue = qValue * HCM; // fixed-point multiplication
-					
+					//qValue = qValue * HCM; // fixed-point multiplication
+					fpTemp = qValue * HCM; //11./5 * 3./13 = 14./18
+					qValue = fpTemp[28:13]; //14./18 ===> 11./5
+
 					if (qValue < bestvalue_buf) begin // fixed-point comparison
 						besthop_buf = i;
 						bestvalue_buf = qValue;

@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`define MEM_DEPTH  1024
+`define MEM_DEPTH  2048
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
@@ -24,6 +24,7 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 	always @ (posedge clock) begin
 		if (!nrst) begin
 			done_buf <= 0;
+			forAggregation_buf <= 0;
 			action_buf <= nexthop;
 			state <= 0;
 		end
