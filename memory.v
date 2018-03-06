@@ -50,16 +50,42 @@ module mem(clock, address, wr_en, data_in, data_out);
 */
 	// Test Case
 	initial begin
+	/*
 		// HCM
 		memory['h648] = ;
-		memory['h648+1] = ;
-
-		memory['h648 + 1] = ;
 		memory['h648 + 1] = ;
 
-		memory['h648 + 1] = ;
-		memory['h648 + 1] = ;
+		memory['h648 + 2] = ;
+		memory['h648 + 3] = ;
 
+		memory['h648 + 4] = ;
+		memory['h648 + 5] = ;
+
+		memory['h648 + 6] = ;
+		memory['h648 + 7] = ;
+
+		memory['h648 + 8] = ;
+		memory['h648 + 9] = ;
+
+		memory['h648 + 10] = ;
+		memory['h648 + 11] = ;
+
+		memory['h648 + 12] = ;
+		memory['h648 + 13] = ;
+
+		memory['h648 + 14] = ;
+		memory['h648 + 15] = ;
+
+		memory['h648 + 16] = ;
+		memory['h648 + 17] = ;
+
+		memory['h648 + 18] = ;
+		memory['h648 + 19] = ;
+
+		memory['h648 + 20] = ;
+		memory['h648 + 21] = ;
+
+	//*/
 		// knownSinkCount
 		memory['h688] = 0;
 		memory['h688 + 1] = 5;
