@@ -18,7 +18,7 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 
 	// Registers
 	reg forAggregation_buf, done_buf, wr_en_buf;
-	reg [`WORD_WIDTH-1:0] action_buf, address_count, data_out_buf, rng_in_buf;
+	reg [`WORD_WIDTH-1:0] action_buf, address_count, data_out_buf;
 	reg [2:0] state;
 
 	always @ (posedge clock) begin
@@ -58,7 +58,7 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 				2: begin
 					wr_en_buf = 0;
 					state = 3;
-					rng_in_buf <= rng_in;
+					data_out_buf <= rng_in;
 					address_count <= 16'h7FE;
 				end
 
