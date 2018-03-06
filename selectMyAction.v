@@ -12,7 +12,7 @@
 
 module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, action, data_out, forAggregation, done, rng_in);
 	input clock, nrst, start;
-	input [`WORD_WIDTH-1:0] nexthop, nextsinks, rng_out;
+	input [`WORD_WIDTH-1:0] nexthop, nextsinks, rng_in;
 	output forAggregation, done, wr_en;
 	output [`WORD_WIDTH-1:0] action, address, data_out;
 
@@ -58,7 +58,7 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 				2: begin
 					wr_en_buf = 0;
 					state = 3;
-					rng_in_buf <= rng_out;
+					rng_in_buf <= rng_in;
 					address_count <= 16'h7FE;
 				end
 
