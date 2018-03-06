@@ -23,6 +23,8 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 	reg [`WORD_WIDTH-1:0] address_count, neighborCount, k;
 	reg [`WORD_WIDTH-1:0] mybest_buf, qValue, HCM; // fixed-point
 	reg [1:0] state;
+	reg [31:0] kTemp; //MIKKO temp int
+	reg [1:0] count; //MIKKO
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
@@ -30,6 +32,7 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 			address_count = 16'h68A; // neighborCount address
 			mybest_buf <= 16'hFFFE; // fixed-point
 			state <= 0;
+			count <= 2'd3;
 			k <= 0;
 		end
 		else begin
@@ -54,7 +57,8 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 						mybest_buf = qValue;
 					end
 
-					if (address_count == 16'h1C8 + 2*neighborCount) begin
+					if (address_count == 16'h1C8 + 2*(neighborCount-1)) begin
+						/*
 						state = 3;
 						k = $ceil((`HCM_LENGTH-1) * MY_BATTERY_STAT); // fixed-point multiplication
 
@@ -62,13 +66,40 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 							k = `HCM_LENGTH - 1;
 
 						address_count = 16'h648 + 2*k; // HCM address
+						*/
+						case(count)
+							2'd3: begin
+								//MULT
+								kTemp = (`HCM_LENGTH - 1) * MY_BATTERY_STAT; //16./0 * 1./15 = 17./15
+								count <= count - 1;
+							end
+							2'd2: begin
+								//CEIL
+								if(kTemp[14:0] != 15'd0) 
+									k <= kTemp[30:15] + 1;
+								else
+									k <= kTemp[30:15];
+								count <= count - 1;
+							end
+							2'd1: begin
+								if (k >= `HCM_LENGTH)
+									k = `HCM_LENGTH - 1;
+								address_count = 16'h648 + 2*k; // HCM address
+								//NEXT STATE
+								state = 3;
+							end
+						endcase
+
+						
 					end
 					else address_count = address_count + 2; // qValue address
 				end
 
 				3: begin
 					HCM = data_in;
-					mybest_buf = mybest_buf * data_in; // fixed-point multiplication
+					//mybest_buf = mybest_buf * HCM; // fixed-point multiplication
+					kTemp = mybest_buf * data_in; //fixed-point multiplication 11./5 * 11./5 = 11./5
+					mybest_buf = kTemp[20:5];
 					state = 4;
 				end
 
