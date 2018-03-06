@@ -50,13 +50,23 @@ module mem(clock, address, wr_en, data_in, data_out);
 */
 	// Test Case
 	initial begin
+		// HCM
+		memory['h648] = ;
+		memory['h648+1] = ;
+
+		memory['h648 + 1] = ;
+		memory['h648 + 1] = ;
+
+		memory['h648 + 1] = ;
+		memory['h648 + 1] = ;
+
 		// knownSinkCount
 		memory['h688] = 0;
-		memory['h688+1] = 5;
+		memory['h688 + 1] = 5;
 
 		// neighborCount
 		memory['h68A] = 0;
-		memory['h68A+1] = 4;
+		memory['h68A + 1] = 4;
 
 		///* fixSinkList testcase
 		// neighborID
