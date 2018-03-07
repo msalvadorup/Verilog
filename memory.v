@@ -35,19 +35,6 @@ module mem(clock, address, wr_en, data_in, data_out);
 	//	$readmemh("./mem.txt", memory);
 	//end
 
-/*
-    // INITIAL CONTENTS FOR TESTING PURPOSES ONLY
-    integer i;
-    initial begin
-        for (i = 0; i < 15; i=i+1) begin
-            memory[i*2+1] = 15 - i;   // totoong value
-            memory[i*2] = 0;          // padding para hindi XX
-        end
-    end
-    MY_NODE_ID <= 3;
-	destinationID <= 3;
-	MY_CLUSTER_ID <= 1;
-*/
 	// Test Case
 	initial begin
 		memory['h648 + 20] = 8'b00100000;	// 1.0
@@ -83,42 +70,6 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h648 + 0] = 8'b10110000;	// 5.5
 		memory['h648 + 1] = 8'b0;
 
-	/*
-		// HCM
-		memory['h648] = ;
-		memory['h648 + 1] = ;
-
-		memory['h648 + 2] = ;
-		memory['h648 + 3] = ;
-
-		memory['h648 + 4] = ;
-		memory['h648 + 5] = ;
-
-		memory['h648 + 6] = ;
-		memory['h648 + 7] = ;
-
-		memory['h648 + 8] = ;
-		memory['h648 + 9] = ;
-
-		memory['h648 + 10] = ;
-		memory['h648 + 11] = ;
-
-		memory['h648 + 12] = ;
-		memory['h648 + 13] = ;
-
-		memory['h648 + 14] = ;
-		memory['h648 + 15] = ;
-
-		memory['h648 + 16] = ;
-		memory['h648 + 17] = ;
-
-		memory['h648 + 18] = ;
-		memory['h648 + 19] = ;
-
-		memory['h648 + 20] = ;
-		memory['h648 + 21] = ;
-
-	//*/
 
 		// FLAGS
 		memory['h0] = 0;
