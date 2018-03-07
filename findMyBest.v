@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`define MEM_DEPTH  1024
+`define MEM_DEPTH  2048
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 `define HCM_LENGTH 11
@@ -33,7 +33,7 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 			mybest_buf <= 16'hFFFE; // fixed-point
 			state <= 0;
 			count <= 2'd3;
-			k <= 0;
+			k <= 0;	// HCM index
 		end
 		else begin
 			case (state)
@@ -58,56 +58,44 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 					end
 
 					if (address_count == 16'h1C8 + 2*(neighborCount-1)) begin
-						/*
 						state = 3;
-						k = $ceil((`HCM_LENGTH-1) * MY_BATTERY_STAT); // fixed-point multiplication
-
-						if (k >= `HCM_LENGTH)
-							k = `HCM_LENGTH - 1;
-
-						address_count = 16'h648 + 2*k; // HCM address
-						*/
-						case(count)
-							2'd3: begin
-								//MULT
-								kTemp = (`HCM_LENGTH - 1) * MY_BATTERY_STAT; //16./0 * 1./15 = 17./15
-								count <= count - 1;
-							end
-							2'd2: begin
-								//CEIL
-								if(kTemp[14:0] != 15'd0) 
-									k <= kTemp[30:15] + 1;
-								else
-									k <= kTemp[30:15];
-								count <= count - 1;
-							end
-							2'd1: begin
-								if (k >= `HCM_LENGTH)
-									k = `HCM_LENGTH - 1;
-								address_count = 16'h648 + 2*k; // HCM address
-								//NEXT STATE
-								state = 3;
-							end
-						endcase
-
-						
 					end
 					else address_count = address_count + 2; // qValue address
 				end
 
 				3: begin
-					HCM = data_in;
-					//mybest_buf = mybest_buf * HCM; // fixed-point multiplication
-					kTemp = mybest_buf * data_in; //fixed-point multiplication 11./5 * 11./5 = 11./5
-					mybest_buf = kTemp[20:5];
+					kTemp = (`HCM_LENGTH - 1) * MY_BATTERY_STAT; //16./0 * 1./15 = 17./15
 					state = 4;
 				end
 
 				4: begin
+					if(kTemp[14:0] != 15'd0) 
+						k <= kTemp[30:15] + 1;
+					else
+						k <= kTemp[30:15];
+					state = 5;
+				end
+
+				5: begin
+					if (k >= `HCM_LENGTH)
+						k = `HCM_LENGTH - 1;
+					address_count = 16'h648 + 2*k; // HCM address
+					state = 6;
+				end
+
+				6: begin
+					HCM = data_in;
+					//mybest_buf = mybest_buf * HCM; // fixed-point multiplication
+					kTemp = mybest_buf * data_in; //fixed-point multiplication 11./5 * 11./5 = 11./5
+					mybest_buf = kTemp[20:5];
+					state = 7;
+				end
+
+				7: begin
 					done_buf = 1;
 				end
 
-				default: state = 4;
+				default: state = 7;
 			endcase
 		end
 	end
