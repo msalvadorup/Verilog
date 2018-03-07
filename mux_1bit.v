@@ -1,7 +1,3 @@
-`timescale 1ns/1ps
-`define MEM_DEPTH  1024
-`define MEM_WIDTH  8
-`define WORD_WIDTH 16
 
 /*
  * wr_en Multiplexer (8:1)

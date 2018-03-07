@@ -31,9 +31,9 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 
 	//STORE INITIAL CONTENTS
-	initial begin
-		$readmemh("./mem.txt", memory);
-	end
+	//initial begin
+	//	$readmemh("./mem.txt", memory);
+	//end
 
 /*
     // INITIAL CONTENTS FOR TESTING PURPOSES ONLY
@@ -50,6 +50,39 @@ module mem(clock, address, wr_en, data_in, data_out);
 */
 	// Test Case
 	initial begin
+		memory['h648 + 20] = 8'b00100000;	// 1.0
+		memory['h648 + 21] = 8'b0;
+
+		memory['h648 + 18] = 8'b00100110;	// 1.19	~ 1.18994140625
+		memory['h648 + 19] = 8'b00010100;
+
+		memory['h648 + 16] = 8'b00101101;	// 1.41 ~ 1.409912109375
+		memory['h648 + 17] = 8'b00011110;
+
+		memory['h648 + 14] = 8'b00110101;	// 1.67 ~ 1.669921875
+		memory['h648 + 15] = 8'b01110000;
+
+		memory['h648 + 12] = 8'b00111111;	// 1.98 ~ 1.97998046875
+		memory['h648 + 13] = 8'b01011100;
+
+		memory['h648 + 10] = 8'b01001011;	// 2.35 ~ 2.3499755859375
+		memory['h648 + 11] = 8'b00110011;
+
+		memory['h648 + 8] = 8'b01011000;	// 2.78 ~ 2.7799072265625
+		memory['h648 + 9] = 8'b11110101;
+
+		memory['h648 + 6] = 8'b01101001;	// 3.3 ~ 3.2999267578125
+		memory['h648 + 7] = 8'b10011001;
+
+		memory['h648 + 4] = 8'b01111101;	// 3.91 ~ 3.909912109375
+		memory['h648 + 5] = 8'b00011110;
+
+		memory['h648 + 2] = 8'b10010100;	// 4.64 ~ 4.639892578125
+		memory['h648 + 3] = 8'b01111010;
+
+		memory['h648 + 0] = 8'b10110000;	// 5.5
+		memory['h648 + 1] = 8'b0;
+
 	/*
 		// HCM
 		memory['h648] = ;
@@ -86,6 +119,52 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h648 + 21] = ;
 
 	//*/
+
+		// FLAGS
+		memory['h0] = 0;
+		memory['h1] = 0;
+
+		memory['h2] = 0;
+		memory['h3] = 0;
+
+		memory['h4] = 0;
+		memory['h5] = 0;
+
+		memory['h6] = 0;
+		memory['h7] = 0;
+
+		// knownSinks
+		memory['h8 + 0] = 0;
+		memory['h8 + 1] = 2;
+
+		memory['h8 + 2] = 0;
+		memory['h8 + 3] = 5;
+
+		memory['h8 + 4] = 0;
+		memory['h8 + 5] = 10;
+
+		memory['h8 + 6] = 0;
+		memory['h8 + 7] = 171;
+
+		memory['h8 + 8] = 0;
+		memory['h8 + 9] = 205;
+
+		// worstHops
+		memory['h28 + 0] = 0;
+		memory['h28 + 1] = 11;
+
+		memory['h28 + 2] = 0;
+		memory['h28 + 3] = 3;
+
+		memory['h28 + 4] = 0;
+		memory['h28 + 5] = 5;
+
+		memory['h28 + 6] = 0;
+		memory['h28 + 7] = 7;
+
+		memory['h28 + 8] = 0;
+		memory['h28 + 9] = 13;
+
 		// knownSinkCount
 		memory['h688] = 0;
 		memory['h688 + 1] = 5;
@@ -175,17 +254,17 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h248 + 48 + 1] = 2;
 
 		// qValue
-		memory['h1C8 + 0] = 0;
-		memory['h1C8 + 1] = 10;
+		memory['h1C8 + 0] = 8'b1;
+		memory['h1C8 + 1] = 8'b01000000;
 
-		memory['h1C8 + 2] = 0;
-		memory['h1C8 + 3] = 35;
+		memory['h1C8 + 2] = 8'b100;
+		memory['h1C8 + 3] = 8'b01100000;
 
-		memory['h1C8 + 4] = 0;
-		memory['h1C8 + 5] = 40;
+		memory['h1C8 + 4] = 8'b101;
+		memory['h1C8 + 5] = 8'b0;
 
-		memory['h1C8 + 6] = 0;
-		memory['h1C8 + 7] = 60;
+		memory['h1C8 + 6] = 8'b111;
+		memory['h1C8 + 7] = 8'b10000000;
 
 		//*/
 

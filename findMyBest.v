@@ -1,4 +1,3 @@
-`timescale 1ns/1ps
 `define MEM_DEPTH  2048
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
@@ -20,11 +19,10 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 
 	// Registers
 	reg done_buf;
-	reg [`WORD_WIDTH-1:0] address_count, neighborCount, k;
+	reg [`WORD_WIDTH-1:0] address_count, neighborCount, k, l;
 	reg [`WORD_WIDTH-1:0] mybest_buf, qValue, HCM; // fixed-point
-	reg [1:0] state;
+	reg [2:0] state;
 	reg [31:0] kTemp; //MIKKO temp int
-	reg [1:0] count; //MIKKO
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
@@ -32,8 +30,8 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 			address_count = 16'h68A; // neighborCount address
 			mybest_buf <= 16'hFFFE; // fixed-point
 			state <= 0;
-			count <= 2'd3;
 			k <= 0;	// HCM index
+			l <= 0; // neighborCount index
 		end
 		else begin
 			case (state)
@@ -53,14 +51,16 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 
 				2: begin
 					qValue = data_in;
+					l = l + 1;
+					address_count = 16'h1C8 + 2*l; // qValue address
+
 					if (qValue < mybest_buf) begin // fixed-point comparison
 						mybest_buf = qValue;
 					end
 
-					if (address_count == 16'h1C8 + 2*(neighborCount-1)) begin
+					if (l == neighborCount) begin
 						state = 3;
 					end
-					else address_count = address_count + 2; // qValue address
 				end
 
 				3: begin
@@ -70,9 +70,9 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 
 				4: begin
 					if(kTemp[14:0] != 15'd0) 
-						k <= kTemp[30:15] + 1;
+						k = kTemp[30:15] + 1;
 					else
-						k <= kTemp[30:15];
+						k = kTemp[30:15];
 					state = 5;
 				end
 

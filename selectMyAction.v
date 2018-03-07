@@ -24,6 +24,7 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 	always @ (posedge clock) begin
 		if (!nrst) begin
 			done_buf <= 0;
+			wr_en_buf <= 0;
 			forAggregation_buf <= 0;
 			action_buf <= nexthop;
 			state <= 0;
@@ -59,19 +60,16 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 				2: begin
 					wr_en_buf = 0;
 					state = 3;
-					data_out_buf <= rng_in;
-					address_count <= 16'h7FE;
+					data_out_buf = rng_in;
+					address_count = 16'h7FE;
+					wr_en_buf = 1;
 				end
 
 				3: begin
-					wr_en_buf <= 1;
-					state <= 4;
-				end
-				4: begin
-					wr_en_buf <= 0;
+					wr_en_buf = 0;
 					done_buf = 1;	
 				end
-				default: state <= 5;
+				default: state = 3;
 			endcase
 		end
 	end
