@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`define MEM_DEPTH  1024
+`define MEM_DEPTH  2048
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 `define HCM_LENGTH 11
@@ -126,7 +126,10 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 				6: begin
 					wr_en_buf = 0;
 					state = 7;
-					k = $ceil((`HCM_LENGTH-1) * batteryStat); // fixed-point multiplication
+					
+					//k = $ceil((`HCM_LENGTH-1) * batteryStat); // fixed-point multiplication
+					fpTemp = 16'b10 * batteryStat; // 16.0 * 1.15 = 17.15
+					k = fpTemp[30:15];	// disregard left-most bit
 
 					if (k >= `HCM_LENGTH)
 						k = `HCM_LENGTH - 1;
