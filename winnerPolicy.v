@@ -24,7 +24,6 @@ module winnerPolicy(
 	rng_address,
 	start_rngAddress,
 	done_rng_address,
-	mux_select,
 	betterNeighborCount,
 	which
 );
@@ -33,13 +32,10 @@ module winnerPolicy(
 	input [`WORD_WIDTH-1:0] mybest, besthop, bestvalue, bestneighborID, MY_NODE_ID, data_in, epsilon, epsilon_step, rng_out, rng_out_4bit, rng_address;
 	output [`WORD_WIDTH-1:0] address, nexthop, betterNeighborCount, which;
 	output done_winnerPolicy, start_rngAddress;
-	output [1:0] mux_select;
-
 	// Registers
 	reg [`WORD_WIDTH-1:0] explore_constant, which_buf, address_count, epsilon_buf, epsilon_temp, nexthop_buf; 
 	reg [`WORD_WIDTH-1:0] betterNeighborCount_buf, rng_address_temp;
 	reg done_winnerPolicy_buf, start_rngAddress_buf;
-	reg [1:0] mux_select_buf;
 	reg one, two, three;
 	reg [9:0] nineninenine;
 	reg [25:0] _left, _right;
@@ -106,7 +102,6 @@ module winnerPolicy(
 						epsilon_temp <= epsilon_buf - epsilon_step;
 					
 					// Done winnerPolicy
-					done_winnerPolicy_buf = 1;
 					state <= 8;
 				end
 				4'd5: begin            
@@ -125,7 +120,7 @@ module winnerPolicy(
 						nexthop_buf <= besthop;
 
 						// Done winnerPolicy
-						done_winnerPolicy_buf <= 1;
+
 						state <= 8;
 					end
 					else begin
@@ -162,9 +157,11 @@ module winnerPolicy(
 					if (one & two & three) begin
 						nexthop_buf <= besthop;
 					end
-
-					done_winnerPolicy_buf <= 1;
 					state <= 8;
+				end
+
+				4'd8: begin
+					done_winnerPolicy_buf <= 1;
 				end
 				default
 					state <= 8;                 

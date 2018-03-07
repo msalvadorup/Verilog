@@ -35,6 +35,7 @@
 `include "winnerPolicy.v"
 `include "rngAddress.v"
 `include "selectMyAction.v"
+`include "reward.v"
 
 
 module testbench();
@@ -113,10 +114,9 @@ module testbench();
 	reg [`WORD_WIDTH-1:0] epsilon, epsilon_step;
 	wire [`WORD_WIDTH-1:0] nexthop, addr_6_1;
 	wire done_winnerPolicy;
-	wire [1:0] mux_select;
 	winnerPolicy wp1(clock, nrst, done_betterNeighborsInMyCluster, mybest, besthop, bestvalue, bestneighborID, MY_NODE_ID,
 						addr_6_1, mem_data_out, epsilon, epsilon_step, nexthop, done_winnerPolicy, rng_out, rng_out_4bit, 
-						rng_address, start_rngAddress, done_rngAddress, mux_select, betterNeighborCount, which
+						rng_address, start_rngAddress, done_rngAddress, betterNeighborCount, which
 	);
 
 	// Mux Address
@@ -128,12 +128,17 @@ module testbench();
 	end
 
 	assign addr_6 = addr_6_buf;
-	/*
+	
 	// selectMyAction MODULE
 	wire [`WORD_WIDTH-1:0] action;
 	wire forAggregation3, done_selectMyAction;
-	selectMyAction sma1(clock, nrst, done_winnerPolicy, addr_7, wren_7, nexthop, nextsinks, action, mem_data_in, forAggregation3, done_selectMyAction, rng_out);
+	selectMyAction sma1(clock, nrst, done_winnerPolicy, addr_7, wren_7, nexthop, nextsinks, action, mdi_7, forAggregation3, done_selectMyAction, rng_out);
 	//*/
+
+	// reward MODULE
+
+	//reward r1(clock, nrst, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, address, data_in, data_out, done);
+
 	// Clock
 	initial begin
 		clock = 0;
@@ -203,7 +208,7 @@ module testbench();
 		else if (done_betterNeighborsInMyCluster && !done_winnerPolicy) begin
 			addr_select <= 6;
 		end
-		/*
+		
 		else if (done_winnerPolicy && !done_selectMyAction) begin
 			addr_select <= 7;
 			wr_select <= 7;

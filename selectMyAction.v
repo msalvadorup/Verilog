@@ -67,9 +67,14 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 
 				3: begin
 					wr_en_buf = 0;
-					done_buf = 1;	
+					state = 4;
 				end
-				default: state = 3;
+
+				4: begin
+					done_buf = 1;
+				end
+
+				default: state = 4;
 			endcase
 		end
 	end
