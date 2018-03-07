@@ -46,23 +46,25 @@ module testbench();
 	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);
 	
 	// MUX MODULE
-	reg [2:0] addr_select;
+	reg [2:0] addr_select, wr_select;
 	
 	wire [`WORD_WIDTH-1:0] addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7;
 	mux addr_mux(addr_select, address, addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7);
 
-	wire [`WORD_WIDTH-1:0] mdi_0, mdi_1, mdi_2, mdi_3, mdi_4, mdi_5, mdi_6, mdi_7;
+	wire [`WORD_WIDTH-1:0] mdi_0, mdi_1, mdi_2, mdi_3, mdi_5, mdi_7;
+	reg [`WORD_WIDTH-1:0] mdi_4, mdi_6;
 	mux mdi_mux(addr_select, mem_data_in, mdi_0, mdi_1, mdi_2, mdi_3, mdi_4, mdi_5, mdi_6, mdi_7);
 	
-	wire wren_0, wren_1, wren_2, wren_3, wren_4, wren_5, wren_6, wren_7;
-	mux_1bit wren_mux(addr_select, wr_en, wren_0, wren_1, wren_2, wren_3, wren_4, wren_5, wren_6, wren_7);
+	wire wren_0, wren_1, wren_2, wren_3, wren_5, wren_7;
+	reg wren_4, wren_6;
+	mux_1bit wren_mux(wr_select, wr_en, wren_0, wren_1, wren_2, wren_3, wren_4, wren_5, wren_6, wren_7);
 	
 	// learnCosts MODULE
 	reg start;
 	wire done_learnCosts;
 	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID;
 	learnCosts lc1(clock, nrst, start, fsourceID, fbatteryStat, fValue, fclusterID, addr_0, wren_0, mem_data_out, mdi_0, reinit, done_learnCosts);
-
+	//*/
 	// amISink MODULE
 	wire forAggregation1, done_iamSink;
 	amISink ais1(clock, nrst, done_learnCosts, addr_1, wren_1, mem_data_out, mdi_1, forAggregation1, done_iamSink);
@@ -87,7 +89,7 @@ module testbench();
 	wire [`WORD_WIDTH-1:0] mybest;
 	wire done_findMyBest;
 	findMyBest fmb1(clock, nrst, done_neighborSinkInOtherCluster, addr_4, mem_data_out, MY_BATTERY_STAT, mybest, done_findMyBest);
-
+	
 	// betterNeighborsInMyCluster MODULE
 	wire [`WORD_WIDTH-1:0] besthop, bestvalue, bestneighborID, nextsinks;
 	wire done_betterNeighborsInMyCluster;
@@ -126,12 +128,12 @@ module testbench();
 	end
 
 	assign addr_6 = addr_6_buf;
-
+	/*
 	// selectMyAction MODULE
 	wire [`WORD_WIDTH-1:0] action;
 	wire forAggregation3, done_selectMyAction;
-	selectMyAction sma1(clock, nrst, done_winnerPolicy, addr_7, wr_en, nexthop, nextsinks, action, mem_data_in, forAggregation3, done_selectMyAction, rng_out);
-
+	selectMyAction sma1(clock, nrst, done_winnerPolicy, addr_7, wren_7, nexthop, nextsinks, action, mem_data_in, forAggregation3, done_selectMyAction, rng_out);
+	//*/
 	// Clock
 	initial begin
 		clock = 0;
@@ -147,8 +149,14 @@ module testbench();
 
 	// MY_NODE_ID, fdestinationID, MY_CLUSTER_ID
 	initial begin
+		wren_4 <= 0;
+		wren_6 <= 0;
+		
+		mdi_4 <= 0;
+		mdi_6 <= 0;
+		
 		start <= 1;
-		MY_BATTERY_STAT <= 1;
+		MY_BATTERY_STAT <= 16'h8000;
 		//done_learnCosts <= 1;
 		MY_NODE_ID <= 3;
 		fsourceID <= 1;
@@ -166,29 +174,39 @@ module testbench();
 		///*
 		if (start && !done_learnCosts) begin
 			addr_select <= 0;
+			wr_select <= 0;
 		end
 		//*/
 		else if (done_learnCosts && !done_iamSink) begin
 			addr_select <= 1;
+			wr_select <= 1;
 		end
 		///*
 		else if (done_iamForwarding && !done_fixSinkList) begin
 			addr_select <= 2;
+			wr_select <= 2;
 		end
 		else if (done_fixSinkList && !done_neighborSinkInOtherCluster) begin
 			addr_select <= 3;
+			wr_select <= 3;
 		end
+		
 		else if (done_neighborSinkInOtherCluster && !done_findMyBest) begin
 			addr_select <= 4;
 		end
+		
 		else if (done_findMyBest && !done_betterNeighborsInMyCluster) begin
 			addr_select <= 5;
+			wr_select <= 5;
 		end
+		
 		else if (done_betterNeighborsInMyCluster && !done_winnerPolicy) begin
 			addr_select <= 6;
 		end
+		/*
 		else if (done_winnerPolicy && !done_selectMyAction) begin
 			addr_select <= 7;
+			wr_select <= 7;
 		end
 		//*/
 		/*
@@ -223,18 +241,7 @@ module testbench();
 		end
 		*/
 	end    
-/*
-	// Memory testbench
-	
-	initial begin
-		wr_en = 0;
-		#5
-		mem_data_in = 1;
-		address = 0; 
-		wr_en = 1;
-		#10 wr_en = 0;
-	end
-//*/
+
 	integer i;
 	initial begin
 		$dumpfile("testbench.vcd");
@@ -244,7 +251,7 @@ module testbench();
 		$display("%X%X", mem1.memory[(i*2)], mem1.memory[(i*2)+1],);
 		end
 
-		#50000
+		#10000
 		$finish;
 	end
 endmodule

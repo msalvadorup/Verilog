@@ -124,20 +124,27 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 				end
 
 				6: begin
-					wr_en_buf = 0;
-					state = 7;
-					
 					//k = $ceil((`HCM_LENGTH-1) * batteryStat); // fixed-point multiplication
-					fpTemp = 16'b10 * batteryStat; // 16.0 * 1.15 = 17.15
-					k = fpTemp[30:15];	// disregard left-most bit
-
+					wr_en_buf = 0;
+					fpTemp = (`HCM_LENGTH) * batteryStat; // 16.0 * 1.15 = 17.15
+					state = 7;
+				end
+				7: begin
+					if(fpTemp[14:0] != 15'd0) 
+						k <= fpTemp[30:15] + 1;
+					else
+						k <= fpTemp[30:15];
+					state = 8;
+				end
+				8: begin
 					if (k >= `HCM_LENGTH)
 						k = `HCM_LENGTH - 1;
-					
+
 					address_count = 16'h648 + 2*k; // HCM address
+
+					state = 9;
 				end
-				
-				7: begin
+				9: begin
 					HCM = data_in;
 					//qValue = qValue * HCM; // fixed-point multiplication
 					fpTemp = qValue * HCM; //11./5 * 3./13 = 14./18
@@ -148,17 +155,17 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 						bestvalue_buf = qValue;
 					end
 
-					state = 8;
+					state = 10;
 					address_count = 16'h48 + 2*i; // neighborID address
 				end
 
-				8: begin
+				10: begin
 					neighborID = data_in;
-					state = 9;
+					state = 11;
 					address_count = 16'h8 + 2*j; // knownSinks address
 				end
 
-				9: begin
+				11: begin
 					knownSinks = data_in;
 					// $display("%d,%d,%d,%d,%d,%d,%d", batteryStat, qValue, k, neighborID, knownSinks, i, j);
 					// If there is a neighbor sink in my cluster, send my packet to that sink!
@@ -177,29 +184,29 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 					end
 
 					if (i == neighborCount) begin
-						state = 10;
+						state = 12;
 						address_count = 16'h48 + 2*besthop_buf; // bestneighborID address
 					end
 				end
 
-				10: begin
+				12: begin
 					bestneighborID_buf = data_in;
-					state = 11;
+					state = 13;
 					data_out_buf = betterneighborCount;
 					address_count = 16'h68C;
 					wr_en_buf = 1;
 				end
 
-				11: begin
+				13: begin
 					wr_en_buf = 0;
-					state = 12;
+					state = 14;
 				end
 
-				12: begin
+				14: begin
 					done_buf = 1;
 				end
 
-				default: state = 12;
+				default: state = 14;
 			endcase
 		end
 	end
