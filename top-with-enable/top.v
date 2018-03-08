@@ -23,6 +23,7 @@
 
 `include "memory.v"
 `include "mux.v"
+`include "mux2.v"
 `include "mux_1bit.v"
 `include "learnCosts.v"
 `include "amISink.v"
@@ -59,7 +60,11 @@ module top(clock, nrst, en);
 	wire wren_0, wren_1, wren_2, wren_3, wren_5, wren_7;
 	reg wren_4, wren_6;
 	mux_1bit wren_mux(wr_select, wr_en, wren_0, wren_1, wren_2, wren_3, wren_4, wren_5, wren_6, wren_7);
-	
+
+	wire internalmux_select;
+	wire [`WORD_WIDTH-1:0] addr_6_0, addr_6_1;
+	mux2 winnerPolicy_addr_mux(internalmux_select, addr_6, addr_6_1, addr_6_0);
+
 	// learnCosts MODULE
 	wire done_learnCosts;
 	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID;
@@ -98,9 +103,7 @@ module top(clock, nrst, en);
 	// winnerPolicy MODULE
 
 	// RNG MODULE
-	reg [`WORD_WIDTH-1:0] addr_6_buf;
-	wire [`WORD_WIDTH-1:0] rng_out, rng_out_4bit, addr_6_0;
-	wire internalmux_select;
+	wire [`WORD_WIDTH-1:0] rng_out, rng_out_4bit;
 	randomGenerator rng1(clock, nrst, mem_data_out, addr_6_0, rng_out, rng_out_4bit, internalmux_select);
 
 	// Modulo Module
@@ -111,23 +114,13 @@ module top(clock, nrst, en);
 	// WinnerPolicy Module
 	reg start_winnerPolicy;
 	reg [`WORD_WIDTH-1:0] epsilon, epsilon_step;
-	wire [`WORD_WIDTH-1:0] nexthop, addr_6_1;
+	wire [`WORD_WIDTH-1:0] nexthop;
 	wire done_winnerPolicy;
 	winnerPolicy wp1(clock, nrst, done_betterNeighborsInMyCluster, mybest, besthop, bestvalue, bestneighborID, MY_NODE_ID,
 						addr_6_1, mem_data_out, epsilon, epsilon_step, nexthop, done_winnerPolicy, rng_out, rng_out_4bit, 
 						rng_address, start_rngAddress, done_rngAddress, betterNeighborCount, which
 	);
 
-	// Mux Address
-	always @ (*) begin
-		if (internalmux_select)
-			addr_6_buf = addr_6_0;
-		else
-			addr_6_buf = addr_6_1;
-	end
-
-	assign addr_6 = addr_6_buf;
-	
 	// selectMyAction MODULE
 	wire [`WORD_WIDTH-1:0] action;
 	wire forAggregation3, done_selectMyAction;
