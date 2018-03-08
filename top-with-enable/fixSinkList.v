@@ -3,8 +3,8 @@
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
-module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
-	input clock, nrst, start;
+module fixSinkList(clock, nrst, en, start, address, wr_en, data_in, data_out, done);
+	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] data_in;
 	output done, wr_en;
 	output [`WORD_WIDTH-1:0] address, data_out;
@@ -17,13 +17,13 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			done_buf <= 0;
-			wr_en_buf <= 0;
-			address_count <= 16'h68A; // neighborCount address
-			state <= 0;
-			i <= 0; // qValue, sinkIDCount
-			j <= 0; // knownSinks, worstHops
-			k <= 0; // sinkID_index
+			done_buf = 0;
+			wr_en_buf = 0;
+			address_count = 16'h68A; // neighborCount address
+			state = 12;
+			i = 0; // qValue, sinkIDCount
+			j = 0; // knownSinks, worstHops
+			k = 0; // sinkID_index
 		end
 		else begin
 			case (state)
@@ -155,9 +155,23 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 
 				11: begin
 					done_buf = 1;
+					state = 12;
 				end
 
-				default: state = 11;
+				12: begin
+					if (en) begin
+						done_buf = 0;
+						wr_en_buf = 0;
+						address_count = 16'h68A; // neighborCount address
+						state = 0;
+						i = 0; // qValue, sinkIDCount
+						j = 0; // knownSinks, worstHops
+						k = 0; // sinkID_index
+					end
+					else state = 12;
+				end
+
+				default: state = 12;
 			endcase
 		end
 	end

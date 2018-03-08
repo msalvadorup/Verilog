@@ -10,8 +10,8 @@
  * NOte: Gagawin pang fixed-point yung mga values
  */
 
-module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest, done);
-	input clock, nrst, start;
+module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, mybest, done);
+	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] data_in, MY_BATTERY_STAT;
 	output done;
 	output [`WORD_WIDTH-1:0] address;
@@ -21,17 +21,17 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 	reg done_buf;
 	reg [`WORD_WIDTH-1:0] address_count, neighborCount, k, l;
 	reg [`WORD_WIDTH-1:0] mybest_buf, qValue, HCM; // fixed-point
-	reg [2:0] state;
+	reg [3:0] state;
 	reg [31:0] kTemp; //MIKKO temp int
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			done_buf <= 0;
+			done_buf = 0;
 			address_count = 16'h68A; // neighborCount address
-			mybest_buf <= 16'hFFFE; // fixed-point
-			state <= 0;
-			k <= 0;	// HCM index
-			l <= 0; // neighborCount index
+			mybest_buf = 16'hFFFE; // fixed-point
+			state = 8;
+			k = 0;	// HCM index
+			l = 0;  // neighborCount index
 		end
 		else begin
 			case (state)
@@ -93,9 +93,22 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 
 				7: begin
 					done_buf = 1;
+					state = 8;
 				end
 
-				default: state = 7;
+				8: begin
+					if (en) begin
+						done_buf <= 0;
+						address_count = 16'h68A; // neighborCount address
+						mybest_buf <= 16'hFFFE; // fixed-point
+						state <= 0;
+						k <= 0;	// HCM index
+						l <= 0; // neighborCount index
+					end
+					else state = 8;
+				end
+
+				default: state = 8;
 			endcase
 		end
 	end

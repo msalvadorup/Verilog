@@ -7,8 +7,8 @@
  *  0x0 - forAggregation
  */
 
-module amISink(clock, nrst, start, address, wr_en, data_in, data_out, forAggregation, done);
-	input clock, nrst, start;
+module amISink(clock, nrst, en, start, address, wr_en, data_in, data_out, forAggregation, done);
+	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] data_in;
 	output forAggregation, done, wr_en;
 	output [`WORD_WIDTH-1:0] address, data_out;
@@ -17,15 +17,15 @@ module amISink(clock, nrst, start, address, wr_en, data_in, data_out, forAggrega
 	reg forAggregation_buf, done_buf, wr_en_buf, data_out_buf;
 	reg [`WORD_WIDTH-1:0] address_count;
 	reg [`WORD_WIDTH-1:0] amISink;
-	reg [1:0] state;
+	reg [2:0] state;
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			forAggregation_buf <= 0;
-			done_buf <= 0;
-			wr_en_buf <= 0;
-			address_count <= 16'h0; // amISink (FLAG) address
-			state <= 0;
+			forAggregation_buf = 0;
+			done_buf = 0;
+			wr_en_buf = 0;
+			address_count = 16'h0; // amISink (FLAG) address
+			state = 4;
 		end
 		else begin
 			case (state)
@@ -60,9 +60,21 @@ module amISink(clock, nrst, start, address, wr_en, data_in, data_out, forAggrega
 
 				3: begin
 					done_buf = 1;
+					state = 4;
 				end
 
-				default: state = 3;
+				4: begin
+					if (en) begin
+						forAggregation_buf = 0;
+						done_buf = 0;
+						wr_en_buf = 0;
+						address_count = 16'h0; // amISink (FLAG) address
+						state = 0;
+					end
+					else state = 4;
+				end
+
+				default: state = 4;
 			endcase
 		end
 	end

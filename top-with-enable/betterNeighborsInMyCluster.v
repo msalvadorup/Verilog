@@ -16,8 +16,8 @@
  * Note: Gagawin pang fixed-point yung mga values
  */
 
-module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, MY_CLUSTER_ID, mybest, besthop, bestvalue, bestneighborID, nextsinks, data_out, done);
-	input clock, nrst, start;
+module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_in, MY_CLUSTER_ID, mybest, besthop, bestvalue, bestneighborID, nextsinks, data_out, done);
+	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] data_in, MY_CLUSTER_ID;
 	input [`WORD_WIDTH-1:0] mybest; // fixed-point
 	output done, wr_en;
@@ -30,7 +30,7 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 	reg [`WORD_WIDTH-1:0] address_count, data_out_buf, i, j, k;
 	reg [`WORD_WIDTH-1:0] knownSinkCount, neighborCount, clusterID, neighborID, knownSinks, betterneighbors, betterneighborCount, besthop_buf, bestneighborID_buf, nextsinks_buf;
 	reg [`WORD_WIDTH-1:0] BATTERY_THRESHOLD, batteryStat, qValue, bestvalue_buf, HCM; // fixed-point
-	reg [3:0] state;
+	reg [4:0] state;
 	reg [31:0] fpTemp;
 	/**
 	
@@ -44,19 +44,19 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			done_buf <= 0;
-			wr_en_buf <= 0;
-			address_count <= 16'h688; // knownSinkCount address
-			betterneighbors <= 0;
-			betterneighborCount <= 0;
-			besthop_buf <= 16'd65;
-			bestvalue_buf  <= 16'hFFFE; //fixed-point
-			BATTERY_THRESHOLD <= 0; // fixed-point (0.01)
-			nextsinks_buf <= 16'd65;
-			state <= 0;
-			i <= 0;
-			j <= 0;
-			k <= 0;
+			done_buf = 0;
+			wr_en_buf = 0;
+			address_count = 16'h688; // knownSinkCount address
+			betterneighbors = 0;
+			betterneighborCount = 0;
+			besthop_buf = 16'd65;
+			bestvalue_buf  = 16'hFFFE; //fixed-point
+			BATTERY_THRESHOLD = 0; // fixed-point (0.01)
+			nextsinks_buf = 16'd65;
+			state = 15;
+			i = 0;
+			j = 0;
+			k = 0;
 		end
 		else begin
 			case (state)
@@ -204,9 +204,29 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 
 				14: begin
 					done_buf = 1;
+					state = 15;
 				end
 
-				default: state = 14;
+				15: begin
+					if (en) begin
+						done_buf = 0;
+						wr_en_buf = 0;
+						address_count = 16'h688; // knownSinkCount address
+						betterneighbors = 0;
+						betterneighborCount = 0;
+						besthop_buf = 16'd65;
+						bestvalue_buf  = 16'hFFFE; //fixed-point
+						BATTERY_THRESHOLD = 0; // fixed-point (0.01)
+						nextsinks_buf = 16'd65;
+						state = 0;
+						i = 0;
+						j = 0;
+						k = 0;
+					end
+					else state = 15; 
+				end
+
+				default: state = 15;
 			endcase
 		end
 	end

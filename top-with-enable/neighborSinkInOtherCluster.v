@@ -9,8 +9,8 @@
  * 2: Get knownSinks and determine forAggregation flag
  */
 
-module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, MY_CLUSTER_ID, data_out, forAggregation, done);
-	input clock, nrst, start;
+module neighborSinkInOtherCluster(clock, nrst, en, start, address, wr_en, data_in, MY_CLUSTER_ID, data_out, forAggregation, done);
+	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] data_in, MY_CLUSTER_ID;
 	output forAggregation, done, wr_en;
 	output [`WORD_WIDTH-1:0] address, data_out;
@@ -19,17 +19,17 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 	reg forAggregation_buf, done_buf, wr_en_buf;
 	reg [`WORD_WIDTH-1:0] address_count, data_out_buf, i, j;
 	reg [`WORD_WIDTH-1:0] knownSinkCount, neighborCount, neighborID, clusterID, knownSinks;
-	reg [2:0] state;
+	reg [3:0] state;
 	 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			forAggregation_buf <= 0;
-			done_buf <= 0;
-			wr_en_buf <= 0;
-			address_count <= 16'h688; // knownSinkCount address
-			state <= 0;
-			i <= 0;
-			j <= 0;
+			forAggregation_buf = 0;
+			done_buf = 0;
+			wr_en_buf = 0;
+			address_count = 16'h688; // knownSinkCount address
+			state = 8;
+			i = 0;
+			j = 0;
 		end
 		else begin
 			case (state)
@@ -104,9 +104,23 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 
 				7: begin
 					done_buf = 1;
+					state = 8;
+				end
+
+				8: begin
+					if (en) begin
+						forAggregation_buf = 0;
+						done_buf = 0;
+						wr_en_buf = 0;
+						address_count = 16'h688; // knownSinkCount address
+						state = 0;
+						i = 0;
+						j = 0;
+					end
+					else state = 8;
 				end
 				
-				default: state = 7;    
+				default: state = 8;    
 			endcase
 		end
 	end
