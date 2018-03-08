@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`define MEM_DEPTH  1024
+`define MEM_DEPTH  2048
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 `define CLOCK_PD 20
@@ -37,10 +37,8 @@ module winnerPolicy(
 	reg [`WORD_WIDTH-1:0] betterNeighborCount_buf, rng_address_temp;
 	reg done_winnerPolicy_buf, start_rngAddress_buf;
 	reg one, two, three;
-	reg [9:0] nineninenine;
-	reg [25:0] _left, _right;
-	reg [5:0] onezerozeroone;
-	reg [31:0] _left2, _right2;
+	reg [15:0] nineninenine, onezerozeroone;
+	reg [31:0] _right3, _right2, _left, _right;
 	reg [31:0] mybest_shifted;
 
 	reg [4:0] state;
@@ -50,10 +48,9 @@ module winnerPolicy(
 			done_winnerPolicy_buf <= 0;
 			nexthop_buf <= 100;     // 100 = -1 for the lack of representation on negative numbers
 			epsilon_buf <= epsilon;
-			done_winnerPolicy_buf = 0;
-			start_rngAddress_buf = 0;
-			nineninenine <= 10'b1111111111;   // 0.999 in binary fraction ~ 0.9990234375
-			onezerozeroone <= 6'b100001;    // 0.001 in binary fraction ~ 0.001007080078125
+			start_rngAddress_buf <= 0;
+			nineninenine <= 16'b1111111110111110;   	// 0.999 in binary fraction ~ 0.998992919921875 0.16
+			onezerozeroone <= 16'b1000000000100000;    	// 0.001 in binary fraction ~ 0.001007080078125	1.15
 		end
 		else begin
 			case (state)
@@ -92,7 +89,8 @@ module winnerPolicy(
 						// address and index of betterNeighbor
 						address_count <= 16'h668 + rng_address_temp*2;
 					end
-					else state <= 3;
+					else 
+						state <= 3;
 				end
 				4'd4: begin
 					nexthop_buf <= data_in;
@@ -102,69 +100,69 @@ module winnerPolicy(
 						epsilon_temp <= epsilon_buf - epsilon_step;
 					
 					// Done winnerPolicy
-					state <= 8;
+					state <= 10;
 				end
 				4'd5: begin            
 					/*
-					 *  [15:0] bestvalue   - 12 bits whole, 4 bits fraction
-					 *  [15:0] mybest      - 12 bits whole, 4 bits fraction
-					 *  [9:0] nineninenine  - 10 bits fraction
-					 *  _left, _right = 12 bits whole, 14 bits fraction
+					 *  [15:0] bestvalue   - 11 bits whole, 5 bits fraction
+					 *  [15:0] mybest      - 11 bits whole, 5 bits fraction
+					 *  [15:0] nineninenine  - 16 bits fraction
+					 *  _left, _right = 11 bits whole, 21 bits fraction
 					 */
-					_left = {bestvalue, 10'b0};
+					_left = {bestvalue, 16'b0};
 					_right = mybest * nineninenine;
-
+					state <= 6;
+				end
+				4'd6: begin
 					// Malayong mas malaki ang mybest kaysa bestvalue 
 					if (_left < _right) begin
 						one <= 0;
 						nexthop_buf <= besthop;
 
 						// Done winnerPolicy
-
-						state <= 8;
+						state <= 10;
 					end
 					else begin
-						one = 1;
-						state <= 6;
+						one <= 1;
+						state <= 7;
 					end
 				end
-				4'd6: begin
+				4'd7: begin
 					/*
-					 *  [15:0] bestvalue   - 12 bits whole, 4 bits fraction
-					 *  [15:0] mybest      - 12 bits whole, 4 bits fraction
-					 *  [8:0] onezerozeroone - 15 bits fraction
-					 *  _left, _right = 12 bits whole, 19 bits fraction
+					 *  [15:0] bestvalue   - 11 bits whole, 5 bits fraction
+					 *  [15:0] mybest      - 11 bits whole, 5 bits fraction
+					 *  [15:0] onezerozeroone - 1 bit whole, 15 bits fraction
+					 *  _left, _right2 = 12 bits whole, 20 bits fraction
 					 */
-					_left2 = {bestvalue, 15'b0};
-					_right2 = mybest * onezerozeroone; // 12 bits whole, 10 bits fraction 
-					mybest_shifted = {mybest, 19'b0};
-					_right2 = _right2 + mybest_shifted;
-
-					if (_left2 < _right2) 
+					_right2 = mybest * onezerozeroone; // 12 bits whole, 20 bits fraction 
+					mybest_shifted = {mybest, 15'b0};
+					_right3 = _right2 + mybest_shifted;
+					state <= 8;
+				end
+				4'd8: begin
+					if (_left < _right3) 
 						two <= 1;
 					else
-						two <= 2;
+						two <= 0;
 
 					if (bestneighborID == MY_NODE_ID)
 						three <= 0;
 					else
 						three <= 1;
 
-					state <= 7;
+					state <= 9;
 				end
-				4'd7: begin
-
+				4'd9: begin
 					if (one & two & three) begin
 						nexthop_buf <= besthop;
 					end
-					state <= 8;
+						state <= 10;
 				end
-
-				4'd8: begin
+				4'd10: begin
 					done_winnerPolicy_buf <= 1;
 				end
 				default
-					state <= 8;                 
+					state <= 10;                 
 			endcase
 		end
 	end
