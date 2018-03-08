@@ -38,8 +38,8 @@
 `include "reward.v"
 
 
-module top(clock, nrst, en);
-	input clock, nrst, en;
+module top(clock, nrst);
+	input clock, nrst;
 	wire wr_en;
 	// MEMORY MODULE
 	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 

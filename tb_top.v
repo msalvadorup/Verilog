@@ -6,10 +6,10 @@
 `include "top.v"
 
 module tb_top();	
-	reg clock, nrst, en;
+	reg clock, nrst;
 
 	// Top Module Instantiation
-	top t1(clock, nrst, en);
+	top t1(clock, nrst);
 
 	// Clock
 	initial begin
@@ -22,12 +22,6 @@ module tb_top();
 		nrst = 1;
 		#5 nrst = ~nrst;
 		#25 nrst = ~nrst;
-	end
-
-	// Enable
-	initial begin
-		en = 1;
-		#21 en = 0;
 	end
 
 	integer i;
