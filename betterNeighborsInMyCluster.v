@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`define MEM_DEPTH  2048
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 `define HCM_LENGTH 11
 
@@ -44,26 +41,26 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			done_buf <= 0;
-			wr_en_buf <= 0;
-			address_count <= 16'h688; // knownSinkCount address
-			betterneighbors <= 0;
-			betterneighborCount <= 0;
-			besthop_buf <= 16'd65;
-			bestvalue_buf  <= 16'hFFFE; //fixed-point
-			BATTERY_THRESHOLD <= 0; // fixed-point (0.01)
-			nextsinks_buf <= 16'd65;
-			state <= 0;
-			i <= 0;
-			j <= 0;
-			k <= 0;
+			done_buf = 0;
+			wr_en_buf = 0;
+			address_count = 16'h688; // knownSinkCount address
+			betterneighbors = 0;
+			betterneighborCount = 0;
+			besthop_buf = 16'd65;
+			bestvalue_buf  = 16'hFFFE; //fixed-point
+			BATTERY_THRESHOLD = 16'h148; // fixed-point (0.01)
+			nextsinks_buf = 16'd65;
+			state = 0;
+			i = 0; // neighbors index
+			j = 0; // knownSinks index
+			k = 0; // HCM idex
 		end
 		else begin
 			case (state)
 				0: begin
 					if (start) begin
 						state = 1;
-						address_count <= 16'h688; // knownSinkCount address
+						address_count = 16'h688; // knownSinkCount address
 					end
 					else state = 0;
 				end
@@ -84,6 +81,7 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 					clusterID = data_in;
 
 					if (MY_CLUSTER_ID != clusterID) begin
+						$display("Neighbor does not belong in my cluster. %d", i);
 						i = i + 1;
 						address_count = 16'hC8 + 2*i; // clusterID address
 					end
@@ -97,6 +95,7 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 					batteryStat = data_in; 
 					
 					if (BATTERY_THRESHOLD > batteryStat) begin
+						$display("Low batteryStat: %b, %d", batteryStat, i);
 						i = i + 1;
 						state = 3;
 						address_count = 16'hC8 + 2*i; // clusterID address
@@ -112,13 +111,15 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 					
 					if (qValue <= mybest) begin // fixed-point comparison
 						betterneighborCount = betterneighborCount + 1;
+						betterneighbors = i;
+						$display("betterneighborCount, betterneighbors: %d, %d", betterneighborCount, betterneighbors);
 						state = 6;
 						data_out_buf = betterneighbors;
 						address_count = 16'h668 + 2*(betterneighborCount-1);
 						wr_en_buf = 1;
 					end
 					else begin
-						state = 8;
+						state = 10;
 						address_count = 16'h48 + 2*i; // neighborID address
 					end
 				end
@@ -126,14 +127,14 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 				6: begin
 					//k = $ceil((`HCM_LENGTH-1) * batteryStat); // fixed-point multiplication
 					wr_en_buf = 0;
-					fpTemp = (`HCM_LENGTH) * batteryStat; // 16.0 * 1.15 = 17.15
+					fpTemp = (`HCM_LENGTH-1) * batteryStat; // 16.0 * 1.15 = 17.15
 					state = 7;
 				end
 				7: begin
 					if(fpTemp[14:0] != 15'd0) 
-						k <= fpTemp[30:15] + 1;
+						k = fpTemp[30:15] + 1;
 					else
-						k <= fpTemp[30:15];
+						k = fpTemp[30:15];
 					state = 8;
 				end
 				8: begin
@@ -171,6 +172,7 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 					// If there is a neighbor sink in my cluster, send my packet to that sink!
 					if (neighborID == knownSinks) begin
 						nextsinks_buf = i;
+						$display("I have neighbor sink in my cluster: %d", nextsinks_buf);
 					end
 
 					j = j + 1;
@@ -191,9 +193,10 @@ module betterNeighborsInMyCluster(clock, nrst, start, address, wr_en, data_in, M
 
 				12: begin
 					bestneighborID_buf = data_in;
+					$display("besthop, bestvalue, bestneighborID: %d, %b, %d", besthop, bestvalue, bestneighborID);
 					state = 13;
 					data_out_buf = betterneighborCount;
-					address_count = 16'h68C;
+					address_count = 16'h68C; // betterneighborCount address
 					wr_en_buf = 1;
 				end
 

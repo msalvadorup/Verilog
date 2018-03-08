@@ -1,14 +1,5 @@
-`define MEM_DEPTH  2048
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 `define HCM_LENGTH 11
-
-/* States
- * 0: Find mybest
- * 1: Compute full mybest
- * 
- * NOte: Gagawin pang fixed-point yung mga values
- */
 
 module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest, done);
 	input clock, nrst, start;
@@ -22,16 +13,16 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 	reg [`WORD_WIDTH-1:0] address_count, neighborCount, k, l;
 	reg [`WORD_WIDTH-1:0] mybest_buf, qValue, HCM; // fixed-point
 	reg [2:0] state;
-	reg [31:0] kTemp; //MIKKO temp int
+	reg [31:0] kTemp, mybestTemp;
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			done_buf <= 0;
+			done_buf = 0;
 			address_count = 16'h68A; // neighborCount address
-			mybest_buf <= 16'hFFFE; // fixed-point
-			state <= 0;
-			k <= 0;	// HCM index
-			l <= 0; // neighborCount index
+			mybest_buf = 16'hFFFE; // fixed-point
+			state = 0;
+			k = 0;	// HCM index
+			l = 0; // neighborCount index
 		end
 		else begin
 			case (state)
@@ -46,16 +37,19 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 				1: begin
 					neighborCount = data_in;
 					state = 2;
-					address_count <= 16'h1C8; // qValue address
+					address_count = 16'h1C8; // qValue address
 				end
 
 				2: begin
 					qValue = data_in;
+					$display("qValue: %b", qValue);
+
 					l = l + 1;
 					address_count = 16'h1C8 + 2*l; // qValue address
 
 					if (qValue < mybest_buf) begin // fixed-point comparison
 						mybest_buf = qValue;
+						$display("mybest: %b", mybest_buf);
 					end
 
 					if (l == neighborCount) begin
@@ -65,6 +59,7 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 
 				3: begin
 					kTemp = (`HCM_LENGTH - 1) * MY_BATTERY_STAT; //16./0 * 1./15 = 17./15
+					$display("MY_BATTERY_STAT: %B", MY_BATTERY_STAT);
 					state = 4;
 				end
 
@@ -86,8 +81,10 @@ module findMyBest(clock, nrst, start, address, data_in, MY_BATTERY_STAT, mybest,
 				6: begin
 					HCM = data_in;
 					//mybest_buf = mybest_buf * HCM; // fixed-point multiplication
-					kTemp = mybest_buf * data_in; //fixed-point multiplication 11./5 * 11./5 = 11./5
-					mybest_buf = kTemp[20:5];
+					mybestTemp = mybest_buf * HCM; //fixed-point multiplication 11./5 * 3./13 = 14./18
+					$display("k, kTemp, mybestTemp, mybest_buf, HCM: %D,%B,%B,%B,%B", k, kTemp, mybestTemp, mybest_buf, HCM);
+					mybest_buf = mybestTemp[28:13]; // 14./18 ===> 11./5
+					$display("mybest_buf: %B", mybest_buf);
 					state = 7;
 				end
 

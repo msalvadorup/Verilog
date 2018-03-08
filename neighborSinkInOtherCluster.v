@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`define MEM_DEPTH  1024
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
 /* States
@@ -23,13 +20,13 @@ module neighborSinkInOtherCluster(clock, nrst, start, address, wr_en, data_in, M
 	 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			forAggregation_buf <= 0;
-			done_buf <= 0;
-			wr_en_buf <= 0;
-			address_count <= 16'h688; // knownSinkCount address
-			state <= 0;
-			i <= 0;
-			j <= 0;
+			forAggregation_buf = 0;
+			done_buf = 0;
+			wr_en_buf = 0;
+			address_count = 16'h688; // knownSinkCount address
+			state = 0;
+			i = 0;
+			j = 0;
 		end
 		else begin
 			case (state)

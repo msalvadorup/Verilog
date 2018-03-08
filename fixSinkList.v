@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`define MEM_DEPTH  2048
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
 module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
@@ -17,13 +14,13 @@ module fixSinkList(clock, nrst, start, address, wr_en, data_in, data_out, done);
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			done_buf <= 0;
-			wr_en_buf <= 0;
-			address_count <= 16'h68A; // neighborCount address
-			state <= 0;
-			i <= 0; // qValue, sinkIDCount
-			j <= 0; // knownSinks, worstHops
-			k <= 0; // sinkID_index
+			done_buf = 0;
+			wr_en_buf = 0;
+			address_count = 16'h68A; // neighborCount address
+			state = 0;
+			i = 0; // qValue, sinkIDCount
+			j = 0; // knownSinks, worstHops
+			k = 0; // sinkID_index
 		end
 		else begin
 			case (state)
