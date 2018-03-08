@@ -11,14 +11,6 @@ module randomGenerator(clock, nrst, mem_data_out, address, rng_out, rng_out_4bit
 	reg feedback, internalmux_select_buf;
 	output internalmux_select;
 
-/*
-	// Memory Module
-	reg wr_en;
-	reg [15:0] data_in, address;
-	wire [15:0] data_out;
-	mem mem3(clock, address, wr_en, data_in, data_out);
-*/
-
 	// RNG
 	reg [2:0] state;
 	always @ (posedge clock) begin
