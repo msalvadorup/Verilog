@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`define MEM_DEPTH  1024
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
 /*  Register bank
@@ -21,11 +18,11 @@ module amISink(clock, nrst, start, address, wr_en, data_in, data_out, forAggrega
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			forAggregation_buf <= 0;
-			done_buf <= 0;
-			wr_en_buf <= 0;
-			address_count <= 16'h0; // amISink (FLAG) address
-			state <= 0;
+			forAggregation_buf = 0;
+			done_buf = 0;
+			wr_en_buf = 0;
+			address_count = 16'h0; // amISink (FLAG) address
+			state = 0;
 		end
 		else begin
 			case (state)

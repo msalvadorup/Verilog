@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`define MEM_DEPTH  1024
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
 module amIForwarding(clock, nrst, start, MY_NODE_ID, destinationID, iamForwarding, done);
@@ -14,9 +11,9 @@ module amIForwarding(clock, nrst, start, MY_NODE_ID, destinationID, iamForwardin
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			iamForwarding_buf <= 0;
-			done_buf <= 0;
-			state <= 0;
+			iamForwarding_buf = 0;
+			done_buf = 0;
+			state = 0;
 		end
 		else begin
 			case (state)
