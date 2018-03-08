@@ -9,7 +9,7 @@ module tb_top();
 	reg clock, nrst, en;
 
 	// Top Module Instantiation
-	top t1(clock, nrst);
+	top t1(clock, nrst, en);
 
 	// Clock
 	initial begin
