@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`define MEM_DEPTH  2048
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
 module fixSinkList(clock, nrst, en, start, address, wr_en, data_in, data_out, done);
