@@ -211,5 +211,6 @@ module winnerPolicy(
 	assign start_rngAddress = start_rngAddress_buf;
 	assign betterNeighborCount = betterNeighborCount_buf;
 	assign which = which_buf;
+	assign wr_en = wr_en_buf;
 	assign en_rng = en_rng_buf;
 endmodule
