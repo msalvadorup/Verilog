@@ -125,7 +125,7 @@ module top(clock, nrst, en);
 	// selectMyAction MODULE
 	wire [`WORD_WIDTH-1:0] action;
 	wire forAggregation3, done_selectMyAction;
-	selectMyAction sma1(clock, nrst, done_winnerPolicy, addr_7, wren_7, nexthop, nextsinks, action, mdi_7, forAggregation3, done_selectMyAction, rng_out);
+	selectMyAction sma1(clock, nrst, en, done_winnerPolicy, addr_7, wren_7, nexthop, nextsinks, action, mdi_7, forAggregation3, done_selectMyAction, rng_out);
 	//*/
 
 	// reward MODULE
