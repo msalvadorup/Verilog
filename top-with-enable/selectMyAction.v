@@ -7,8 +7,8 @@
  * self (CH role)
  */
 
-module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, action, data_out, forAggregation, done, rng_in);
-	input clock, nrst, start;
+module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks, action, data_out, forAggregation, done, rng_in);
+	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] nexthop, nextsinks, rng_in;
 	output forAggregation, done, wr_en;
 	output [`WORD_WIDTH-1:0] action, address, data_out;
@@ -24,7 +24,7 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 			wr_en_buf = 0;
 			forAggregation_buf = 0;
 			action_buf = nexthop;
-			state = 0;
+			state = 6;
 		end
 		else begin
 			case (state)
@@ -70,6 +70,18 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 
 				5: begin
 					done_buf = 1;
+					state = 6;
+				end
+
+				6: begin
+					if (en) begin
+						done_buf = 0;
+						wr_en_buf = 0;
+						forAggregation_buf = 0;
+						action_buf = nexthop;
+						state = 0;
+					end
+					else state = 6;
 				end
 
 				default: state = 5;
