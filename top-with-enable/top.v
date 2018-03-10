@@ -29,7 +29,9 @@
 			c. epsilon_step
 			d. epsilon (okay)
 			
-			Suggestion: Ilagay sa memory (oooops)
+			Suggestion: 
+				1. Ilagay sa memory (oooops)
+				2. Ilagay sa registers at initialize sa nrst or enable
  */
 
 `include "memory.v"
