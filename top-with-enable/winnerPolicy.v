@@ -7,6 +7,7 @@
 module winnerPolicy(
 	clock, 
 	nrst, 
+	en,
 	start_winnerPolicy,
 	mybest,
 	besthop,
@@ -28,7 +29,7 @@ module winnerPolicy(
 	which
 );
 
-	input clock, nrst, start_winnerPolicy, done_rng_address;
+	input clock, nrst, en, start_winnerPolicy, done_rng_address;
 	input [`WORD_WIDTH-1:0] mybest, besthop, bestvalue, bestneighborID, MY_NODE_ID, data_in, epsilon, epsilon_step, rng_out, rng_out_4bit, rng_address;
 	output [`WORD_WIDTH-1:0] address, nexthop, betterNeighborCount, which;
 	output done_winnerPolicy, start_rngAddress;
@@ -160,9 +161,22 @@ module winnerPolicy(
 				end
 				4'd10: begin
 					done_winnerPolicy_buf <= 1;
+					state <= 11;
+				end
+				4'd11: begin
+					if (en) begin
+						state <= 0;
+						done_winnerPolicy_buf <= 0;
+						nexthop_buf <= 100;     // 100 = -1 for the lack of representation on negative numbers
+						epsilon_buf <= epsilon;
+						start_rngAddress_buf <= 0;
+						nineninenine <= 16'b1111111110111110;   	// 0.999 in binary fraction ~ 0.998992919921875 0.16
+						onezerozeroone <= 16'b1000000000100000;    	// 0.001 in binary fraction ~ 0.001007080078125	1.15
+					end
+					else state <= 11;
 				end
 				default
-					state <= 10;                 
+					state <= 11;                 
 			endcase
 		end
 	end

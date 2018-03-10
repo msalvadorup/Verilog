@@ -3,20 +3,20 @@
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
-module amIForwarding(clock, nrst, start, MY_NODE_ID, destinationID, iamForwarding, done);
-	input clock, nrst, start;
+module amIForwarding(clock, nrst, en, start, MY_NODE_ID, destinationID, iamForwarding, done);
+	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] MY_NODE_ID, destinationID;
 	output iamForwarding, done;
 
 	// Registers
 	reg iamForwarding_buf, done_buf;
-	reg [1:0] state;
+	reg [2:0] state;
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			iamForwarding_buf <= 0;
-			done_buf <= 0;
-			state <= 0;
+			iamForwarding_buf = 0;
+			done_buf = 0;
+			state = 3;
 		end
 		else begin
 			case (state)
@@ -35,9 +35,19 @@ module amIForwarding(clock, nrst, start, MY_NODE_ID, destinationID, iamForwardin
 
 				2: begin
 					done_buf = 1;
+					state = 3;
 				end
 
-				default: state = 2;
+				3: begin
+					if (en) begin
+						iamForwarding_buf = 0;
+						done_buf = 0;
+						state = 0;
+					end
+					else state = 3;
+				end
+
+				default: state = 3;
 			endcase
 		end
 	end
