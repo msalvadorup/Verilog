@@ -21,6 +21,17 @@
  * (2/64)       [0x68E - 0x70D]     sinkIDCount
  */
 
+/*
+ *	Missing Features:
+ *		1. Saan ilalagay yung mga unique ID at mga global variable ng bawat node?
+			a. MY_NODE_ID
+			b. CLUSTER_ID
+			c. epsilon_step
+			d. epsilon (okay)
+			
+			Suggestion: Ilagay sa memory (oooops)
+ */
+
 `include "memory.v"
 `include "mux.v"
 `include "mux2.v"
@@ -41,7 +52,6 @@
 
 module top(clock, nrst, en);
 	input clock, nrst, en;
-	reg en2;
 	wire wr_en;
 	// MEMORY MODULE
 	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
@@ -68,8 +78,8 @@ module top(clock, nrst, en);
 
 	// learnCosts MODULE
 	wire done_learnCosts;
-	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID;
-	learnCosts lc1(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, addr_0, wren_0, mem_data_out, mdi_0, reinit, done_learnCosts);
+	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon;
+	learnCosts lc1(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon, addr_0, wren_0, mem_data_out, mdi_0, done_learnCosts);
 	//*/
 	// amISink MODULE
 	wire forAggregation1, done_iamSink;
