@@ -1,6 +1,3 @@
-`timescale 1ns/1ps
-`define MEM_DEPTH  2048
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
 /* Possible Actions
@@ -10,8 +7,8 @@
  * self (CH role)
  */
 
-module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, action, data_out, forAggregation, done, rng_in);
-	input clock, nrst, start;
+module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks, action, data_out, forAggregation, done, rng_in);
+	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] nexthop, nextsinks, rng_in;
 	output forAggregation, done, wr_en;
 	output [`WORD_WIDTH-1:0] action, address, data_out;
@@ -23,11 +20,11 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			done_buf <= 0;
-			wr_en_buf <= 0;
-			forAggregation_buf <= 0;
-			action_buf <= nexthop;
-			state <= 0;
+			done_buf = 0;
+			wr_en_buf = 0;
+			forAggregation_buf = 0;
+			action_buf = nexthop;
+			state = 6;
 		end
 		else begin
 			case (state)
@@ -42,11 +39,12 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 						action_buf = nextsinks;
 						//$display("Send pkt to neighbor sink in my cluster!");
 					end
-					else state = 3;
+					state = 2;
+				end
 
-					if (action_buf == 65) begin
+				2: begin
+					if (action_buf == 300) begin
 						forAggregation_buf = 1;
-						state = 2;
 						data_out_buf = 16'h1;
 						address_count = 16'h2; // forAggregation (FLAG) address
 						wr_en_buf = 1;
@@ -57,24 +55,36 @@ module selectMyAction(clock, nrst, start, address, wr_en, nexthop, nextsinks, ac
 					state = 3;
 				end
 
-				2: begin
+				3: begin
 					wr_en_buf = 0;
-					state = 3;
+					state = 4;
 					data_out_buf = rng_in;
 					address_count = 16'h7FE;
 					wr_en_buf = 1;
 				end
 
-				3: begin
-					wr_en_buf = 0;
-					state = 4;
-				end
-
 				4: begin
-					done_buf = 1;
+					wr_en_buf = 0;
+					state = 5;
 				end
 
-				default: state = 4;
+				5: begin
+					done_buf = 1;
+					state = 6;
+				end
+
+				6: begin
+					if (en) begin
+						done_buf = 0;
+						wr_en_buf = 0;
+						forAggregation_buf = 0;
+						action_buf = nexthop;
+						state = 0;
+					end
+					else state = 6;
+				end
+
+				default: state = 5;
 			endcase
 		end
 	end

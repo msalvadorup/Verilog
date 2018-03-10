@@ -21,9 +21,21 @@
  * (2/64)       [0x68E - 0x70D]     sinkIDCount
  */
 
+/*
+ *	Missing Features:
+ *		1. Saan ilalagay yung mga unique ID at mga global variable ng bawat node?
+			a. MY_NODE_ID
+			b. CLUSTER_ID
+			c. epsilon_step
+			d. epsilon (okay)
+			
+			Suggestion: 
+				1. Ilagay sa memory (oooops)
+				2. Ilagay sa registers at initialize sa nrst or enable
+ */
+
 `include "memory.v"
 `include "mux.v"
-`include "mux2.v"
 `include "mux_1bit.v"
 `include "learnCosts.v"
 `include "amISink.v"
@@ -41,7 +53,6 @@
 
 module top(clock, nrst, en);
 	input clock, nrst, en;
-	reg en2;
 	wire wr_en;
 	// MEMORY MODULE
 	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
@@ -54,22 +65,18 @@ module top(clock, nrst, en);
 	wire [`WORD_WIDTH-1:0] addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7;
 	mux addr_mux(addr_select, address, addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7);
 
-	wire [`WORD_WIDTH-1:0] mdi_0, mdi_1, mdi_2, mdi_3, mdi_5, mdi_7;
-	reg [`WORD_WIDTH-1:0] mdi_4, mdi_6;
+	wire [`WORD_WIDTH-1:0] mdi_0, mdi_1, mdi_2, mdi_3, mdi_5, mdi_6, mdi_7;
+	reg [`WORD_WIDTH-1:0] mdi_4;
 	mux mdi_mux(addr_select, mem_data_in, mdi_0, mdi_1, mdi_2, mdi_3, mdi_4, mdi_5, mdi_6, mdi_7);
 	
-	wire wren_0, wren_1, wren_2, wren_3, wren_5, wren_7;
-	reg wren_4, wren_6;
+	wire wren_0, wren_1, wren_2, wren_3, wren_5, wren_6, wren_7;
+	reg wren_4;
 	mux_1bit wren_mux(wr_select, wr_en, wren_0, wren_1, wren_2, wren_3, wren_4, wren_5, wren_6, wren_7);
-
-	wire internalmux_select;
-	wire [`WORD_WIDTH-1:0] addr_6_0, addr_6_1;
-	mux2 winnerPolicy_addr_mux(internalmux_select, addr_6, addr_6_1, addr_6_0);
 
 	// learnCosts MODULE
 	wire done_learnCosts;
-	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID;
-	learnCosts lc1(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, addr_0, wren_0, mem_data_out, mdi_0, reinit, done_learnCosts);
+	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon;
+	learnCosts lc1(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon, addr_0, wren_0, mem_data_out, mdi_0, done_learnCosts);
 	//*/
 	// amISink MODULE
 	wire forAggregation1, done_iamSink;
@@ -104,8 +111,9 @@ module top(clock, nrst, en);
 	// winnerPolicy MODULE
 
 	// RNG MODULE
+	wire en_rng, done_rng;
 	wire [`WORD_WIDTH-1:0] rng_out, rng_out_4bit;
-	randomGenerator rng1(clock, nrst, mem_data_out, addr_6_0, rng_out, rng_out_4bit, internalmux_select);
+	randomGenerator rng1(clock, nrst, rng_out, rng_out_4bit, en_rng, done_rng);
 
 	// Modulo Module
 	wire [`WORD_WIDTH-1:0] rng_address, betterNeighborCount, which;
@@ -118,14 +126,14 @@ module top(clock, nrst, en);
 	wire [`WORD_WIDTH-1:0] nexthop;
 	wire done_winnerPolicy;
 	winnerPolicy wp1(clock, nrst, en, done_betterNeighborsInMyCluster, mybest, besthop, bestvalue, bestneighborID, MY_NODE_ID,
-						addr_6_1, mem_data_out, epsilon, epsilon_step, nexthop, done_winnerPolicy, rng_out, rng_out_4bit, 
+						addr_6, mem_data_out, wren_6, mdi_6, epsilon_step, nexthop, done_winnerPolicy, en_rng, rng_out, rng_out_4bit, 
 						rng_address, start_rngAddress, done_rngAddress, betterNeighborCount, which
 	);
 
 	// selectMyAction MODULE
 	wire [`WORD_WIDTH-1:0] action;
 	wire forAggregation3, done_selectMyAction;
-	selectMyAction sma1(clock, nrst, done_winnerPolicy, addr_7, wren_7, nexthop, nextsinks, action, mdi_7, forAggregation3, done_selectMyAction, rng_out);
+	selectMyAction sma1(clock, nrst, en, done_winnerPolicy, addr_7, wren_7, nexthop, nextsinks, action, mdi_7, forAggregation3, done_selectMyAction, rng_out);
 	//*/
 
 	// reward MODULE
@@ -135,10 +143,10 @@ module top(clock, nrst, en);
 	// MY_NODE_ID, fdestinationID, MY_CLUSTER_ID
 	initial begin
 		wren_4 <= 0;
-		wren_6 <= 0;
+		//wren_6 <= 0;
 		
 		mdi_4 <= 0;
-		mdi_6 <= 0;
+		//mdi_6 <= 0;
 		
 		//start <= 1;
 		MY_BATTERY_STAT <= 16'h8000;
