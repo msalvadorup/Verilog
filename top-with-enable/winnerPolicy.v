@@ -21,6 +21,7 @@ module winnerPolicy(
 	epsilon_step,
 	nexthop,
 	done_winnerPolicy,
+	en_rng,
 	rng_out,
 	rng_out_4bit,
 	rng_address,
@@ -33,11 +34,12 @@ module winnerPolicy(
 	input clock, nrst, en, start_winnerPolicy, done_rng_address;
 	input [`WORD_WIDTH-1:0] mybest, besthop, bestvalue, bestneighborID, MY_NODE_ID, data_in, epsilon_step, rng_out, rng_out_4bit, rng_address;
 	output [`WORD_WIDTH-1:0] address, data_out, nexthop, betterNeighborCount, which;
-	output wr_en, done_winnerPolicy, start_rngAddress;
+	output wr_en, done_winnerPolicy, en_rng, start_rngAddress;
+
 	// Registers
 	reg [`WORD_WIDTH-1:0] explore_constant, which_buf, address_count, epsilon_buf, nexthop_buf, data_out_buf; 
 	reg [`WORD_WIDTH-1:0] betterNeighborCount_buf, rng_address_temp;
-	reg wr_en_buf, done_winnerPolicy_buf, start_rngAddress_buf;
+	reg wr_en_buf, done_winnerPolicy_buf, en_rng_buf, start_rngAddress_buf;
 	reg one, two, three;
 	reg [15:0] nineninenine, onezerozeroone;
 	reg [31:0] _right3, _right2, _left, _right;
@@ -46,8 +48,9 @@ module winnerPolicy(
 	reg [4:0] state;
 	always @ (posedge clock) begin
 		if (!nrst) begin
-			state <= 0;
+			state <= 11;	// Idle State
 			wr_en_buf <= 0;
+			en_rng_buf <= 0;
 			done_winnerPolicy_buf <= 0;
 			nexthop_buf <= 100;     // 100 = -1 for the lack of representation on negative numbers
 			start_rngAddress_buf <= 0;
@@ -56,21 +59,27 @@ module winnerPolicy(
 		end
 		else begin
 			case (state)
-				4'd0: begin
+				5'd0: begin
 					if (start_winnerPolicy) begin
-						state <= 13;
-						explore_constant <= rng_out_4bit; // Generate explore_constant
-						address_count <= 16'h4;
+						state <= 14;
+						en_rng_buf <= 1; // Generate RNG (explore_constant)
 					end
 					else state <= 0;
 				end
-				4'd13: begin
+				5'd14: begin
+					explore_constant <= rng_out_4bit;
+					en_rng_buf <= 0;
+					address_count <= 16'h4; // epsilon address
+					state <= 13;
+				end
+				5'd13: begin
 					epsilon_buf <= data_in;
 					state <= 1;
 				end
-				4'd1: begin
+				5'd1: begin
 					if (explore_constant < epsilon_buf) begin
 						state <= 2;
+						en_rng_buf <= 1; // Generate RNG (which)
 						address_count <= 16'h68C; // betterNeighborCount Address
 					end
 					else begin
@@ -79,7 +88,8 @@ module winnerPolicy(
 						state <= 5;
 					end
 				end
-				4'd2: begin
+				5'd2: begin
+					en_rng_buf <= 0;
 					which_buf <= rng_out_4bit;
 					betterNeighborCount_buf <= data_in;
 					
@@ -87,7 +97,7 @@ module winnerPolicy(
 					start_rngAddress_buf <= 1;
 					state <= 3;
 				end
-				4'd3: begin
+				5'd3: begin
 					if (done_rng_address) begin
 						state <= 4;
 						start_rngAddress_buf <= 0;
@@ -99,7 +109,7 @@ module winnerPolicy(
 					else 
 						state <= 3;
 				end
-				4'd4: begin
+				5'd4: begin
 					nexthop_buf <= data_in;
 					if (epsilon_buf < epsilon_step)
 						data_out_buf <= 0;
@@ -107,11 +117,12 @@ module winnerPolicy(
 						data_out_buf <= epsilon_buf - epsilon_step;
 					
 					// Write epsilon value to memory
+					$display("epsilon: %d", data_out_buf);
 					address_count <= 16'h4;
 					wr_en_buf <= 1;
 					state <= 12;
 				end
-				4'd5: begin            
+				5'd5: begin            
 					/*
 					 *  [15:0] bestvalue   - 11 bits whole, 5 bits fraction
 					 *  [15:0] mybest      - 11 bits whole, 5 bits fraction
@@ -122,7 +133,7 @@ module winnerPolicy(
 					_right = mybest * nineninenine;
 					state <= 6;
 				end
-				4'd6: begin
+				5'd6: begin
 					// Malayong mas malaki ang mybest kaysa bestvalue 
 					if (_left < _right) begin
 						one <= 0;
@@ -136,7 +147,7 @@ module winnerPolicy(
 						state <= 7;
 					end
 				end
-				4'd7: begin
+				5'd7: begin
 					/*
 					 *  [15:0] bestvalue   - 11 bits whole, 5 bits fraction
 					 *  [15:0] mybest      - 11 bits whole, 5 bits fraction
@@ -148,7 +159,7 @@ module winnerPolicy(
 					_right3 = _right2 + mybest_shifted;
 					state <= 8;
 				end
-				4'd8: begin
+				5'd8: begin
 					if (_left < _right3) 
 						two <= 1;
 					else
@@ -161,28 +172,29 @@ module winnerPolicy(
 
 					state <= 9;
 				end
-				4'd9: begin
+				5'd9: begin
 					if (one & two & three) begin
 						nexthop_buf <= besthop;
 					end
 						state <= 10;
 				end
-				4'd10: begin
+				5'd10: begin
 					done_winnerPolicy_buf <= 1;
 					state <= 11;
 				end
-				4'd11: begin
+				5'd11: begin
 					if (en) begin
 						state <= 0;
 						done_winnerPolicy_buf <= 0;
-						nexthop_buf <= 100;     // 100 = -1 for the lack of representation on negative numbers
+						en_rng_buf <= 0;
+						nexthop_buf <= 301;     // 301 = -1 for the lack of representation for negative numbers
 						start_rngAddress_buf <= 0;
 						nineninenine <= 16'b1111111110111110;   	// 0.999 in binary fraction ~ 0.998992919921875 0.16
 						onezerozeroone <= 16'b1000000000100000;    	// 0.001 in binary fraction ~ 0.001007080078125	1.15
 					end
 					else state <= 11;
 				end
-				4'd12: begin
+				5'd12: begin
 					wr_en_buf <= 0;
 					state <= 10; // Done winnerPolicy
 				end
@@ -199,4 +211,5 @@ module winnerPolicy(
 	assign start_rngAddress = start_rngAddress_buf;
 	assign betterNeighborCount = betterNeighborCount_buf;
 	assign which = which_buf;
+	assign en_rng = en_rng_buf;
 endmodule

@@ -20,7 +20,6 @@ module rngAddress(clock, nrst, start_rng_address, betterNeighborCount, which, rn
 					if (start_rng_address) begin
 						state <= 1;
 						rng_address_buf <= which;
-						done_rng_address_buf <= 0;
 					end
 					else state <= 0;
 				end
@@ -35,8 +34,9 @@ module rngAddress(clock, nrst, start_rng_address, betterNeighborCount, which, rn
 				end
 				3'd2: begin
 					done_rng_address_buf <= 1;
-					state <= 0;
+					state <= 3;
 				end
+				3'd3: state <= 4;	// Extra clock para hindi magconflict yung start rng at done rng triggers
 				default: 
                     state <= 0;
 			endcase
