@@ -66,12 +66,12 @@ module top(clock, nrst, en);
 	wire [`WORD_WIDTH-1:0] addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7;
 	mux addr_mux(addr_select, address, addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7);
 
-	wire [`WORD_WIDTH-1:0] mdi_0, mdi_1, mdi_2, mdi_3, mdi_5, mdi_7;
-	reg [`WORD_WIDTH-1:0] mdi_4, mdi_6;
+	wire [`WORD_WIDTH-1:0] mdi_0, mdi_1, mdi_2, mdi_3, mdi_5, mdi_6, mdi_7;
+	reg [`WORD_WIDTH-1:0] mdi_4;
 	mux mdi_mux(addr_select, mem_data_in, mdi_0, mdi_1, mdi_2, mdi_3, mdi_4, mdi_5, mdi_6, mdi_7);
 	
-	wire wren_0, wren_1, wren_2, wren_3, wren_5, wren_7;
-	reg wren_4, wren_6;
+	wire wren_0, wren_1, wren_2, wren_3, wren_5, wren_6, wren_7;
+	reg wren_4;
 	mux_1bit wren_mux(wr_select, wr_en, wren_0, wren_1, wren_2, wren_3, wren_4, wren_5, wren_6, wren_7);
 
 	wire internalmux_select;
@@ -130,7 +130,7 @@ module top(clock, nrst, en);
 	wire [`WORD_WIDTH-1:0] nexthop;
 	wire done_winnerPolicy;
 	winnerPolicy wp1(clock, nrst, en, done_betterNeighborsInMyCluster, mybest, besthop, bestvalue, bestneighborID, MY_NODE_ID,
-						addr_6_1, mem_data_out, epsilon, epsilon_step, nexthop, done_winnerPolicy, rng_out, rng_out_4bit, 
+						addr_6_1, mem_data_out, wren_6, mdi_6, epsilon_step, nexthop, done_winnerPolicy, rng_out, rng_out_4bit, 
 						rng_address, start_rngAddress, done_rngAddress, betterNeighborCount, which
 	);
 
@@ -147,10 +147,10 @@ module top(clock, nrst, en);
 	// MY_NODE_ID, fdestinationID, MY_CLUSTER_ID
 	initial begin
 		wren_4 <= 0;
-		wren_6 <= 0;
+		//wren_6 <= 0;
 		
 		mdi_4 <= 0;
-		mdi_6 <= 0;
+		//mdi_6 <= 0;
 		
 		//start <= 1;
 		MY_BATTERY_STAT <= 16'h8000;
