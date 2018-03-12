@@ -11,11 +11,13 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] nexthop, nextsinks, rng_in;
 	output forAggregation, done, wr_en;
-	output [`WORD_WIDTH-1:0] action, address, data_out;
+	output [10:0] address;
+	output [`WORD_WIDTH-1:0] action, data_out;
 
 	// Registers
 	reg forAggregation_buf, done_buf, wr_en_buf;
-	reg [`WORD_WIDTH-1:0] action_buf, address_count, data_out_buf;
+	reg [10:0] address_count;
+	reg [`WORD_WIDTH-1:0] action_buf, data_out_buf;
 	reg [2:0] state;
 
 	always @ (posedge clock) begin
@@ -46,7 +48,7 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 					if (action_buf == 300) begin
 						forAggregation_buf = 1;
 						data_out_buf = 16'h1;
-						address_count = 16'h2; // forAggregation (FLAG) address
+						address_count = 11'h2; // forAggregation (FLAG) address
 						wr_en_buf = 1;
 						//$display("No better in-cluster head. Schedule aggregation!");
 					end
@@ -59,7 +61,7 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 					wr_en_buf = 0;
 					state = 4;
 					data_out_buf = rng_in;
-					address_count = 16'h7FE;
+					address_count = 11'h7FE;
 					wr_en_buf = 1;
 				end
 

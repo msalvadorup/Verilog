@@ -1,5 +1,3 @@
-`define WORD_WIDTH 16
-
 /*
  * Address Multiplexer (8:1)
  * 0: learnCost
@@ -12,12 +10,12 @@
  * 7: selectMyAction
  */
 
-module mux_16bit(select, out, in0, in1, in2, in3, in4, in5, in6, in7);
+module mux_11bit(select, out, in0, in1, in2, in3, in4, in5, in6, in7);
 	input[2:0] select;
-	input[`WORD_WIDTH-1:0] in0, in1, in2, in3, in4, in5, in6, in7;
-	output[`WORD_WIDTH-1:0] out;
+	input[10:0] in0, in1, in2, in3, in4, in5, in6, in7;
+	output[10:0] out;
 
-	reg [`WORD_WIDTH-1:0] out_buf;
+	reg [10:0] out_buf;
 
 	always @(*) begin
 		case(select)

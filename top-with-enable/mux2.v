@@ -1,5 +1,3 @@
-`define WORD_WIDTH 16
-
 /*
  * Address Multiplexer (2:1)
  * 0: winnerPolicy
@@ -8,10 +6,10 @@
 
 module mux2(select, out, in0, in1);
 	input select;
-	input[`WORD_WIDTH-1:0] in0, in1;
-	output[`WORD_WIDTH-1:0] out;
+	input[10:0] in0, in1;
+	output[10:0] out;
 
-	reg [`WORD_WIDTH-1:0] out_buf;
+	reg [10:0] out_buf;
 
 	always @(*) begin
 		case(select)

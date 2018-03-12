@@ -1,4 +1,3 @@
-`timescale 1ns/1ps
 `define MEM_DEPTH  2048
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
@@ -23,7 +22,8 @@
 
 module mem(clock, address, wr_en, data_in, data_out);
 	input clock, wr_en;
-	input [`WORD_WIDTH-1:0] address, data_in;
+	input [10:0] address;
+	input [`WORD_WIDTH-1:0] data_in;
 	output [`WORD_WIDTH-1:0] data_out;
 
 	//INITIALIZE MEMORY ARRAY

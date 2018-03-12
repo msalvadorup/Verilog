@@ -5,12 +5,13 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] data_in, MY_BATTERY_STAT;
 	output done;
-	output [`WORD_WIDTH-1:0] address;
+	output [10:0] address;
 	output [`WORD_WIDTH-1:0] mybest; // fixed-point
 
 	// Registers
 	reg done_buf;
-	reg [`WORD_WIDTH-1:0] address_count, neighborCount, k, l;
+	reg [10:0] address_count;
+	reg [`WORD_WIDTH-1:0] neighborCount, k, l;
 	reg [`WORD_WIDTH-1:0] mybest_buf, qValue, HCM; // fixed-point
 	reg [3:0] state;
 	reg [31:0] kTemp, mybestTemp;
@@ -18,7 +19,7 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 	always @ (posedge clock) begin
 		if (!nrst) begin
 			done_buf = 0;
-			address_count = 16'h68A; // neighborCount address
+			address_count = 11'h68A; // neighborCount address
 			mybest_buf = 16'hFFFE; // fixed-point
 			state = 8;
 			k = 0;	// HCM index
@@ -29,7 +30,7 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 				0: begin
 					if (start) begin
 						state = 1;
-						address_count = 16'h68A; // neighborCount address
+						address_count = 11'h68A; // neighborCount address
 					end
 					else state = 0;
 				end
@@ -37,7 +38,7 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 				1: begin
 					neighborCount = data_in;
 					state = 2;
-					address_count = 16'h1C8; // qValue address
+					address_count = 11'h1C8; // qValue address
 				end
 
 				2: begin
@@ -45,7 +46,7 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 					$display("qValue: %b", qValue);
 
 					l = l + 1;
-					address_count = 16'h1C8 + 2*l; // qValue address
+					address_count = 11'h1C8 + 2*l; // qValue address
 
 					if (qValue < mybest_buf) begin // fixed-point comparison
 						mybest_buf = qValue;
@@ -74,7 +75,7 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 				5: begin
 					if (k >= `HCM_LENGTH)
 						k = `HCM_LENGTH - 1;
-					address_count = 16'h648 + 2*k; // HCM address
+					address_count = 11'h648 + 2*k; // HCM address
 					state = 6;
 				end
 
@@ -96,7 +97,7 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 				8: begin
 					if (en) begin
 						done_buf <= 0;
-						address_count = 16'h68A; // neighborCount address
+						address_count = 11'h68A; // neighborCount address
 						mybest_buf <= 16'hFFFE; // fixed-point
 						state <= 0;
 						k <= 0;	// HCM index

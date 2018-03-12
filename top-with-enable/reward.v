@@ -1,15 +1,15 @@
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
 module reward(clock, nrst, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, address, data_in, data_out, done);
 
     input clock, nrst, start;
-    input [`WORD_WIDTH-1:0] MY_NODE_ID, MY_CLUSTER_ID, action, besthop, address, data_in;
+    input [`WORD_WIDTH-1:0] MY_NODE_ID, MY_CLUSTER_ID, action, besthop, data_in;
+    output [10:0] address;
     output [`WORD_WIDTH-1:0] data_out;
     output done;
 
     // Registers
-    reg [`WORD_WIDTH-1:0] address_count;
+    reg [10:0] address_count;
     reg [`WORD_WIDTH-1:0] data_out_buf;
     reg done_buf;
 
@@ -29,18 +29,18 @@ module reward(clock, nrst, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, ad
                 end
                 4'd1: begin
                     state <= 2;
-                    address_count = 16'h148 + MY_CLUSTER_ID*2;
+                    address_count = 11'h148 + MY_CLUSTER_ID*2;
                 end
                 4'd2: begin
                     state <= 3;
-                    address_count =  16'h1C8 + besthop*2;
+                    address_count = 11'h1C8 + besthop*2;
                 end
                 4'd3: begin
                     state <= 4;
                 end
                 4'd4: begin
                     state <= 5;
-                    address_count = 16'h48 + action*2;
+                    address_count = 11'h48 + action*2;
                 end
                 4'd5: begin
                     state <= 6;
