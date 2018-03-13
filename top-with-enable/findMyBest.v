@@ -84,7 +84,7 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 					//mybest_buf = mybest_buf * HCM; // fixed-point multiplication
 					mybestTemp = mybest_buf * HCM; //fixed-point multiplication 11./5 * 3./13 = 14./18
 					$display("k, kTemp, mybestTemp, mybest_buf, HCM: %D,%B,%B,%B,%B", k, kTemp, mybestTemp, mybest_buf, HCM);
-					mybest_buf = mybestTemp[28:13]; // 14./18 ===> 11./5
+					mybest_buf = mybestTemp[28:13] + 'b100000; // 14./18 ===> 11./5
 					$display("mybest_buf: %B", mybest_buf);
 					state = 7;
 				end
@@ -96,12 +96,12 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 
 				8: begin
 					if (en) begin
-						done_buf <= 0;
+						done_buf = 0;
 						address_count = 11'h68A; // neighborCount address
-						mybest_buf <= 16'hFFFE; // fixed-point
-						state <= 0;
-						k <= 0;	// HCM index
-						l <= 0; // neighborCount index
+						mybest_buf = 16'hFFFE; // fixed-point
+						state = 0;
+						k = 0;	// HCM index
+						l = 0; // neighborCount index
 					end
 					else state = 8;
 				end
