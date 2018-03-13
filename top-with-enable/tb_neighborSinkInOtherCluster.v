@@ -45,13 +45,15 @@ module tb_neighborSinkInOtherCluster();
 
 	// Reset
 	initial begin
+		en = 0;
 		nrst = 1;
 		#5 nrst = ~nrst;
 		#25 nrst = ~nrst;
+		#20 en = 1;
+		#20 en = 0;
 	end
 
 	initial begin
-		en = 1;
 		done_fixSinkList = 1;
 		MY_CLUSTER_ID = 1;
 	end

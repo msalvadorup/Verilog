@@ -144,8 +144,7 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h248 + 48 + 0] = 0;
 		memory['h248 + 48 + 1] = 2;
 
-		// HCM
-		
+		// HCM		
 		memory['h648 + 0] = 8'b10110000;	// 5.5
 		memory['h648 + 1] = 8'b0;
 

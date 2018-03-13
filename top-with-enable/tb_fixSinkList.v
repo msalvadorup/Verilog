@@ -43,13 +43,15 @@ module tb_fixSinkList();
 
 	// Reset
 	initial begin
+		en = 0;
 		nrst = 1;
 		#5 nrst = ~nrst;
 		#25 nrst = ~nrst;
+		#20 en = 1;
+		#20 en = 0;
 	end
 
 	initial begin
-		en = 1;
 		done_iamDestination = 1;
 	end
 

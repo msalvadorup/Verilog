@@ -45,13 +45,15 @@ module tb_findMyBest();
 
 	// Reset
 	initial begin
+		en = 0;
 		nrst = 1;
 		#5 nrst = ~nrst;
 		#25 nrst = ~nrst;
+		#20 en = 1;
+		#20 en = 0;
 	end
 
 	initial begin
-		en = 1;
 		done_neighborSinkInOtherCluster = 1;
 		MY_BATTERY_STAT = 16'h8000;
 	end    
