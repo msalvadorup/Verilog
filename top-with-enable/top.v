@@ -35,11 +35,12 @@
  */
 
 `include "memory.v"
-`include "mux.v"
+`include "mux_11bit.v"
+`include "mux_16bit.v"
 `include "mux_1bit.v"
 `include "learnCosts.v"
 `include "amISink.v"
-`include "amIForwarding.v"
+`include "amIDestination.v"
 `include "fixSinkList.v"
 `include "neighborSinkInOtherCluster.v"
 `include "findMyBest.v"
@@ -56,18 +57,18 @@ module top(clock, nrst, en);
 	wire wr_en;
 	// MEMORY MODULE
 	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
-	wire [`WORD_WIDTH-1:0] address;
+	wire [10:0] address;
 	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);
 	
 	// MUX MODULE
 	reg [2:0] addr_select, wr_select;
 	
-	wire [`WORD_WIDTH-1:0] addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7;
-	mux addr_mux(addr_select, address, addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7);
+	wire [10:0] addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7;
+	mux_11bit addr_mux(addr_select, address, addr_0, addr_1, addr_2, addr_3, addr_4, addr_5, addr_6, addr_7);
 
 	wire [`WORD_WIDTH-1:0] mdi_0, mdi_1, mdi_2, mdi_3, mdi_5, mdi_6, mdi_7;
 	reg [`WORD_WIDTH-1:0] mdi_4;
-	mux mdi_mux(addr_select, mem_data_in, mdi_0, mdi_1, mdi_2, mdi_3, mdi_4, mdi_5, mdi_6, mdi_7);
+	mux_16bit mdi_mux(addr_select, mem_data_in, mdi_0, mdi_1, mdi_2, mdi_3, mdi_4, mdi_5, mdi_6, mdi_7);
 	
 	wire wren_0, wren_1, wren_2, wren_3, wren_5, wren_6, wren_7;
 	reg wren_4;
@@ -82,20 +83,19 @@ module top(clock, nrst, en);
 	wire forAggregation1, done_iamSink;
 	amISink ais1(clock, nrst, en, done_learnCosts, addr_1, wren_1, mem_data_out, mdi_1, forAggregation1, done_iamSink);
   
-	// amIForwarding MODULE
+	// amIDestination MODULE
 	reg [`WORD_WIDTH-1:0] MY_NODE_ID, fdestinationID;
-	wire iamForwarding, done_iamForwarding;
-	amIForwarding aif1(clock, nrst, en, done_iamSink, MY_NODE_ID, fdestinationID, iamForwarding, done_iamForwarding);
+	wire iamDestination, done_iamDestination;
+	amIDestination aif1(clock, nrst, en, done_iamSink, MY_NODE_ID, fdestinationID, iamDestination, done_iamDestination);
 	
 	// fixSinkList MODULE
 	wire done_fixSinkList;
-	fixSinkList fsl1(clock, nrst, en, done_iamForwarding, addr_2, wren_2, mem_data_out, mdi_2, done_fixSinkList);
+	fixSinkList fsl1(clock, nrst, en, done_iamDestination, addr_2, wren_2, mem_data_out, mdi_2, done_fixSinkList);
 
 	// neighborSinkInOtherCluster MODULE
 	reg [`WORD_WIDTH-1:0] MY_CLUSTER_ID;
 	wire forAggregation2, done_neighborSinkInOtherCluster;
 	neighborSinkInOtherCluster nsioc1(clock, nrst, en, done_fixSinkList, addr_3, wren_3, mem_data_out, MY_CLUSTER_ID, mdi_3, forAggregation2, done_neighborSinkInOtherCluster);
-	//neighborSinkInOtherCluster nsioc1(clock, nrst, done_iamForwarding, addr_3, wren_3, mem_data_out, MY_CLUSTER_ID, mdi_3, forAggregation2, done_neighborSinkInOtherCluster);
 	
 	// findMyBest MODULE
 	reg [`WORD_WIDTH-1:0] MY_BATTERY_STAT;
@@ -202,21 +202,22 @@ module top(clock, nrst, en);
 
 	// Address Selection
 	always @ (*) begin
-		///*
+
 		if (!done_learnCosts) begin
 			addr_select <= 0;
 			wr_select <= 0;
 		end
-		//*/
+
 		else if (done_learnCosts && !done_iamSink) begin
 			addr_select <= 1;
 			wr_select <= 1;
 		end
-		///*
-		else if (done_iamForwarding && !done_fixSinkList) begin
+
+		else if (done_iamDestination && !done_fixSinkList) begin
 			addr_select <= 2;
 			wr_select <= 2;
 		end
+
 		else if (done_fixSinkList && !done_neighborSinkInOtherCluster) begin
 			addr_select <= 3;
 			wr_select <= 3;
@@ -239,37 +240,6 @@ module top(clock, nrst, en);
 			addr_select <= 7;
 			wr_select <= 7;
 		end
-		//*/
-		/*
-		else if (done_iamForwarding && !done_neighborSinkInOtherCluster) begin
-			addr_select <= 3;
-		end
-		//*/
-
-		/*/
-		else if (done_iamForwarding && !done_fixSinkList) begin
-			addr_select <= 2;
-		end
-		else if (done_fixSinkList && !done_neighborSinkInOtherCluster) begin
-			addr_select <= 3;
-		end
-		//*/
 	end
-/*
-	always @ (done_iamSink or done_iamForwarding or done_neighborSinkInOtherCluster) begin
-		if (done_iamSink && forAggregation1) begin
-			nrst = ~nrst;
-			#25 nrst = ~nrst;
-		end
-		if (done_iamForwarding && !iamForwarding) begin
-			nrst = ~nrst;
-			#25 nrst = ~nrst;
-		end
-		
-		if (done_neighborSinkInOtherCluster && forAggregation2) begin
-			nrst = ~nrst;
-			#25 nrst = ~nrst;
-		end
-	end    
-*/
+
 endmodule

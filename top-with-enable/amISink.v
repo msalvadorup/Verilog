@@ -8,11 +8,12 @@ module amISink(clock, nrst, en, start, address, wr_en, data_in, data_out, forAgg
 	input clock, nrst, en, start;
 	input [`WORD_WIDTH-1:0] data_in;
 	output forAggregation, done, wr_en;
-	output [`WORD_WIDTH-1:0] address, data_out;
+	output [10:0] address;
+	output [`WORD_WIDTH-1:0] data_out;
 
 	// Registers
 	reg forAggregation_buf, done_buf, wr_en_buf, data_out_buf;
-	reg [`WORD_WIDTH-1:0] address_count;
+	reg [10:0] address_count;
 	reg [`WORD_WIDTH-1:0] amISink;
 	reg [2:0] state;
 
@@ -21,7 +22,7 @@ module amISink(clock, nrst, en, start, address, wr_en, data_in, data_out, forAgg
 			forAggregation_buf = 0;
 			done_buf = 0;
 			wr_en_buf = 0;
-			address_count = 16'h0; // amISink (FLAG) address
+			address_count = 11'h0; // amISink (FLAG) address
 			state = 4;
 		end
 		else begin
@@ -29,7 +30,7 @@ module amISink(clock, nrst, en, start, address, wr_en, data_in, data_out, forAgg
 				0: begin
 					if (start) begin
 						state = 1;
-						address_count = 16'h0; // amISink (FLAG) address
+						address_count = 11'h0; // amISink (FLAG) address
 					end
 					else state = 0;
 				end
@@ -41,7 +42,7 @@ module amISink(clock, nrst, en, start, address, wr_en, data_in, data_out, forAgg
 						forAggregation_buf = 1;
 						state = 2;
 						data_out_buf = 16'h1;
-						address_count = 16'h2; // forAggregation (FLAG) address
+						address_count = 11'h2; // forAggregation (FLAG) address
 						wr_en_buf = 1;
 					end
 					else begin
@@ -65,7 +66,7 @@ module amISink(clock, nrst, en, start, address, wr_en, data_in, data_out, forAgg
 						forAggregation_buf = 0;
 						done_buf = 0;
 						wr_en_buf = 0;
-						address_count = 16'h0; // amISink (FLAG) address
+						address_count = 11'h0; // amISink (FLAG) address
 						state = 0;
 					end
 					else state = 4;

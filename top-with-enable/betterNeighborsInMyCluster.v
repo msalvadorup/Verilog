@@ -18,13 +18,15 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 	input [`WORD_WIDTH-1:0] data_in, MY_CLUSTER_ID;
 	input [`WORD_WIDTH-1:0] mybest; // fixed-point
 	output done, wr_en;
-	output [`WORD_WIDTH-1:0] address, data_out;
+	output [10:0] address;
+	output [`WORD_WIDTH-1:0] data_out;
 	output [`WORD_WIDTH-1:0] besthop, bestneighborID, nextsinks;
 	output [`WORD_WIDTH-1:0] bestvalue; // fixed-point
 
 	// Registers
 	reg done_buf, wr_en_buf;
-	reg [`WORD_WIDTH-1:0] address_count, data_out_buf, i, j, k;
+	reg [10:0] address_count;
+	reg [`WORD_WIDTH-1:0] data_out_buf, i, j, k;
 	reg [`WORD_WIDTH-1:0] knownSinkCount, neighborCount, clusterID, neighborID, knownSinks, betterneighbors, betterneighborCount, besthop_buf, bestneighborID_buf, nextsinks_buf;
 	reg [`WORD_WIDTH-1:0] BATTERY_THRESHOLD, batteryStat, qValue, bestvalue_buf, HCM; // fixed-point
 	reg [4:0] state;
@@ -43,7 +45,7 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 		if (!nrst) begin
 			done_buf = 0;
 			wr_en_buf = 0;
-			address_count = 16'h688; // knownSinkCount address
+			address_count = 11'h688; // knownSinkCount address
 			betterneighbors = 0;
 			betterneighborCount = 0;
 			besthop_buf = 16'd65;
@@ -60,7 +62,7 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 				0: begin
 					if (start) begin
 						state = 1;
-						address_count = 16'h688; // knownSinkCount address
+						address_count = 11'h688; // knownSinkCount address
 					end
 					else state = 0;
 				end
@@ -68,13 +70,13 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 				1: begin
 					knownSinkCount = data_in;
 					state = 2;
-					address_count = 16'h68A; // neighborCount address
+					address_count = 11'h68A; // neighborCount address
 				end
 
 				2: begin
 					neighborCount = data_in;
 					state = 3;
-					address_count = 16'hC8; // clusterID address
+					address_count = 11'hC8; // clusterID address
 				end
 				
 				3: begin
@@ -83,11 +85,11 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 					if (MY_CLUSTER_ID != clusterID) begin
 						$display("Neighbor does not belong in my cluster. %d", i);
 						i = i + 1;
-						address_count = 16'hC8 + 2*i; // clusterID address
+						address_count = 11'hC8 + 2*i; // clusterID address
 					end
 					else begin
 						state = 4;
-						address_count = 16'h148 + 2*i; // batteryStat address
+						address_count = 11'h148 + 2*i; // batteryStat address
 					end
 				end
 
@@ -98,11 +100,11 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 						$display("Low batteryStat: %b, %d", batteryStat, i);
 						i = i + 1;
 						state = 3;
-						address_count = 16'hC8 + 2*i; // clusterID address
+						address_count = 11'hC8 + 2*i; // clusterID address
 					end
 					else begin
 						state = 5;
-						address_count = 16'h1C8 + 2*i; // qValue address
+						address_count = 11'h1C8 + 2*i; // qValue address
 					end
 				end
 
@@ -115,12 +117,12 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 						$display("betterneighborCount, betterneighbors: %d, %d", betterneighborCount, betterneighbors);
 						state = 6;
 						data_out_buf = betterneighbors;
-						address_count = 16'h668 + 2*(betterneighborCount-1);
+						address_count = 11'h668 + 2*(betterneighborCount-1);
 						wr_en_buf = 1;
 					end
 					else begin
 						state = 10;
-						address_count = 16'h48 + 2*i; // neighborID address
+						address_count = 11'h48 + 2*i; // neighborID address
 					end
 				end
 
@@ -141,7 +143,7 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 					if (k >= `HCM_LENGTH)
 						k = `HCM_LENGTH - 1;
 
-					address_count = 16'h648 + 2*k; // HCM address
+					address_count = 11'h648 + 2*k; // HCM address
 
 					state = 9;
 				end
@@ -157,13 +159,13 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 					end
 
 					state = 10;
-					address_count = 16'h48 + 2*i; // neighborID address
+					address_count = 11'h48 + 2*i; // neighborID address
 				end
 
 				10: begin
 					neighborID = data_in;
 					state = 11;
-					address_count = 16'h8 + 2*j; // knownSinks address
+					address_count = 11'h8 + 2*j; // knownSinks address
 				end
 
 				11: begin
@@ -176,18 +178,18 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 					end
 
 					j = j + 1;
-					address_count = 16'h8 + 2*j; // knownSinks address
+					address_count = 11'h8 + 2*j; // knownSinks address
 
 					if (j == knownSinkCount) begin
 						j = 0;
 						i = i + 1;
 						state = 3;
-						address_count = 16'hC8 + 2*i; // clusterID address
+						address_count = 11'hC8 + 2*i; // clusterID address
 					end
 
 					if (i == neighborCount) begin
 						state = 12;
-						address_count = 16'h48 + 2*besthop_buf; // bestneighborID address
+						address_count = 11'h48 + 2*besthop_buf; // bestneighborID address
 					end
 				end
 
@@ -196,7 +198,7 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 					$display("besthop, bestvalue, bestneighborID: %d, %b, %d", besthop, bestvalue, bestneighborID);
 					state = 13;
 					data_out_buf = betterneighborCount;
-					address_count = 16'h68C; // betterneighborCount address
+					address_count = 11'h68C; // betterneighborCount address
 					wr_en_buf = 1;
 				end
 
@@ -214,7 +216,7 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 					if (en) begin
 						done_buf = 0;
 						wr_en_buf = 0;
-						address_count = 16'h688; // knownSinkCount address
+						address_count = 11'h688; // knownSinkCount address
 						betterneighbors = 0;
 						betterneighborCount = 0;
 						besthop_buf = 16'd65;
