@@ -4,7 +4,7 @@
 `define WORD_WIDTH 16
 
 /* Address List
- * (2/4)        [0x0 - 0x07]        amISink/forAggregation FLAGS (0-3)
+ * (2/4)        [0x0 - 0x07]        amISink/forAggregation/epsilon FLAGS (0-3)
  * (2/16)       [0x8 - 0x27]        knownSinks (4-19)
  * (2/16)       [0x28 - 0x47]       worstHops (20-35)
  * (2/64)       [0x48 - 0xC7]       neighborID (36-99)
