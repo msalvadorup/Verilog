@@ -37,7 +37,7 @@ module tb_selectMyAction();
 	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);
 	
 	//UUT
-	selectMyAction sma(clock, nrst, en, start, address, wr_en, nexthop, nextsinks, action, data_out, forAggregation, done);
+	selectMyAction sma(clock, nrst, en, start, address, wr_en, nexthop, nextsinks, action, mem_data_in, forAggregation, done);
 
 	// Clock
 	initial begin
