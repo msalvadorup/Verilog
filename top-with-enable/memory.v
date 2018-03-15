@@ -64,10 +64,10 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h8 + 7] = 171;
 
 		memory['h8 + 8] = 0;
-		memory['h8 + 9] = 205;
+		memory['h8 + 9] = 205; // 5 knownSinks
 
-		memory['h8 + 10] = 8'b0;
-		memory['h8 + 11] = 8'b0;
+		memory['h8 + 10] = 0;
+		memory['h8 + 11] = 0;
 
 		// knownSinkCount
 		memory['h688] = 0;
@@ -88,6 +88,9 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 		memory['h668 + 8] = 0;
 		memory['h668 + 9] = 0;
+
+		memory['h668 + 10] = 0;
+		memory['h668 + 11] = 0;
 		
 		// betterneighborCount
 		memory['h68C] = 0;
@@ -107,7 +110,10 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h28 + 7] = 8'b11100000; // 7
 
 		memory['h28 + 8] = 8'b1;
-		memory['h28 + 9] = 8'b10100000; // 13
+		memory['h28 + 9] = 8'b10100000; // 13	// 5 worstHops
+
+		memory['h28 + 10] = 0;
+		memory['h28 + 11] = 0;
 
 		// neighborCount
 		memory['h68A] = 0;
@@ -125,7 +131,13 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h68E + 5] = 3;
 
 		memory['h68E + 6] = 0;
-		memory['h68E + 7] = 1;
+		memory['h68E + 7] = 1;  // 4 sinkIDsCount
+
+		memory['h68E + 8] = 0;
+		memory['h68E + 9] = 0;
+
+		memory['h68E + 10] = 0;
+		memory['h68E + 11] = 0;
 
 		// sinkIDs
 		memory['h248 + 0 + 0] = 0;
@@ -189,7 +201,39 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h248 + 48 + 7] = 0;
 
 		memory['h248 + 48 + 8] = 0;
-		memory['h248 + 48 + 9] = 0;
+		memory['h248 + 48 + 9] = 0; // 4 sinkIDs
+
+
+		memory['h248 + 64 + 0] = 0;
+		memory['h248 + 64 + 1] = 0;
+
+		memory['h248 + 64 + 2] = 0;
+		memory['h248 + 64 + 3] = 0;
+
+		memory['h248 + 64 + 4] = 0;
+		memory['h248 + 64 + 5] = 0;
+
+		memory['h248 + 64 + 6] = 0;
+		memory['h248 + 64 + 7] = 0;
+
+		memory['h248 + 64 + 8] = 0;
+		memory['h248 + 64 + 9] = 0;
+
+
+		memory['h248 + 80 + 0] = 0;
+		memory['h248 + 80 + 1] = 0;
+
+		memory['h248 + 80 + 2] = 0;
+		memory['h248 + 80 + 3] = 0;
+
+		memory['h248 + 80 + 4] = 0;
+		memory['h248 + 80 + 5] = 0;
+
+		memory['h248 + 80 + 6] = 0;
+		memory['h248 + 80 + 7] = 0;
+
+		memory['h248 + 80 + 8] = 0;
+		memory['h248 + 80 + 9] = 0;
 
 		// HCM		
 		memory['h648 + 0] = 8'b10110000;	// 5.5
@@ -238,10 +282,13 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h48 + 5] = 4;
 
 		memory['h48 + 6] = 0;
-		memory['h48 + 7] = 6;
+		memory['h48 + 7] = 6; // 4 neighborID
 
-		memory['h48 + 8] = 8'b0;
-		memory['h48 + 9] = 8'b0;
+		memory['h48 + 8] = 0;
+		memory['h48 + 9] = 0;
+
+		memory['h48 + 10] = 0;
+		memory['h48 + 11] = 0;
 		
 		// clusterID
 		memory['hC8 + 0] = 0;
@@ -254,10 +301,13 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['hC8 + 5] = 1;
 
 		memory['hC8 + 6] = 0;
-		memory['hC8 + 7] = 3;
+		memory['hC8 + 7] = 3;	// 4 clusterID
 
-		memory['hC8 + 8] = 8'b0;
-		memory['hC8 + 9] = 8'b0;
+		memory['hC8 + 8] = 0;
+		memory['hC8 + 9] = 0;
+
+		memory['hC8 + 10] = 0;
+		memory['hC8 + 11] = 0;
 
 		// qValue
 		memory['h1C8 + 0] = 8'b111;			// 60 /1
@@ -274,6 +324,9 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 		memory['h1C8 + 8] = 8'b0;
 		memory['h1C8 + 9] = 8'b0;
+
+		memory['h1C8 + 10] = 8'b0;
+		memory['h1C8 + 11] = 8'b0;
 		
 		// batteryStat
 		memory['h148 + 0] = 8'b01000000;	// 0.5
@@ -287,6 +340,12 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 		memory['h148 + 6] = 8'b10000000;	// 1.0
 		memory['h148 + 7] = 8'b00000000;
+
+		memory['h148 + 8] = 8'b0;
+		memory['h148 + 9] = 8'b0;
+
+		memory['h148 + 10] = 8'b0;
+		memory['h148 + 11] = 8'b0;
 		//*/
 
 		/* fixSinkList, findMyBest testcase
