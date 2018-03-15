@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `define WORD_WIDTH 16
 `define HCM_LENGTH 11
 
@@ -19,26 +20,28 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 	always @ (posedge clock) begin
 		if (!nrst) begin
 			done_buf = 0;
-			address_count = 11'h68A; // neighborCount address
+			address_count <= 11'h68A; // neighborCount address
 			mybest_buf = 16'hFFFE; // fixed-point
-			state = 8;
+			state <= 8;
 			k = 0;	// HCM index
 			l = 0; // neighborCount index
+			kTemp = 32'd0;
+			mybestTemp = 32'd0;
 		end
 		else begin
 			case (state)
 				0: begin
 					if (start) begin
-						state = 1;
-						address_count = 11'h68A; // neighborCount address
+						state <= 1;
+						address_count <= 11'h68A; // neighborCount address
 					end
-					else state = 0;
+					else state <= 0;
 				end
 
 				1: begin
 					neighborCount = data_in;
-					state = 2;
-					address_count = 11'h1C8; // qValue address
+					state <= 2;
+					address_count <= 11'h1C8; // qValue address
 				end
 
 				2: begin
@@ -46,7 +49,7 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 					$display("qValue: %b", qValue);
 
 					l = l + 1;
-					address_count = 11'h1C8 + 2*l; // qValue address
+					address_count <= 11'h1C8 + 2*l; // qValue address
 
 					if (qValue < mybest_buf) begin // fixed-point comparison
 						mybest_buf = qValue;
@@ -54,14 +57,14 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 					end
 
 					if (l == neighborCount) begin
-						state = 3;
+						state <= 3;
 					end
 				end
 
 				3: begin
 					kTemp = (`HCM_LENGTH - 1) * MY_BATTERY_STAT; //16./0 * 1./15 = 17./15
 					$display("MY_BATTERY_STAT: %B", MY_BATTERY_STAT);					
-					state = 4;
+					state <= 4;
 				end
 
 				4: begin
@@ -69,14 +72,14 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 						k = kTemp[30:15] + 1;
 					else
 						k = kTemp[30:15];
-					state = 5;
+					state <= 5;
 				end
 
 				5: begin
 					if (k >= `HCM_LENGTH)
 						k = `HCM_LENGTH - 1;
-					address_count = 11'h648 + 2*k; // HCM address
-					state = 6;
+					address_count <= 11'h648 + 2*k; // HCM address
+					state <= 6;
 				end
 
 				6: begin
@@ -86,27 +89,27 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 					$display("k, kTemp, mybestTemp, mybest_buf, HCM: %D,%B,%B,%B,%B", k, kTemp, mybestTemp, mybest_buf, HCM);
 					mybest_buf = mybestTemp[28:13] + 'b100000; // 14./18 ===> 11./5
 					$display("mybest_buf: %B", mybest_buf);
-					state = 7;
+					state <= 7;
 				end
 
 				7: begin
 					done_buf = 1;
-					state = 8;
+					state <= 8;
 				end
 
 				8: begin
 					if (en) begin
 						done_buf = 0;
-						address_count = 11'h68A; // neighborCount address
+						address_count <= 11'h68A; // neighborCount address
 						mybest_buf = 16'hFFFE; // fixed-point
-						state = 0;
+						state <= 0;
 						k = 0;	// HCM index
 						l = 0; // neighborCount index
 					end
-					else state = 8;
+					else state <= 8;
 				end
 
-				default: state = 8;
+				default: state <= 8;
 			endcase
 		end
 	end

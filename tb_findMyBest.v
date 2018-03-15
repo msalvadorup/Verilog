@@ -27,15 +27,15 @@ module tb_findMyBest();
 	wire wr_en;
 	// MEMORY MODULE
 	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
-	wire [`WORD_WIDTH-1:0] address;
+	wire [10:0] address;
 	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);
 	
 	// findMyBest MODULE
 	reg [`WORD_WIDTH-1:0] MY_BATTERY_STAT;
 	wire [`WORD_WIDTH-1:0] mybest;
-	reg done_neighborSinkInOtherCluster;
+	reg done_neighborSinkInOtherCluster, en;
 	wire done_findMyBest;
-	findMyBest fmb1(clock, nrst, done_neighborSinkInOtherCluster, address, mem_data_out, MY_BATTERY_STAT, mybest, done_findMyBest);
+	findMyBest fmb1(clock, nrst, en, done_neighborSinkInOtherCluster, address, mem_data_out, MY_BATTERY_STAT, mybest, done_findMyBest);
 
 	// Clock
 	initial begin
@@ -51,6 +51,7 @@ module tb_findMyBest();
 	end
 
 	initial begin
+		en = 1;
 		done_neighborSinkInOtherCluster = 1;
 		MY_BATTERY_STAT = 16'h8000;
 	end    

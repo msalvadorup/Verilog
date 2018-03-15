@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 /*
  * Address Multiplexer (8:1)
  * 0: learnCost

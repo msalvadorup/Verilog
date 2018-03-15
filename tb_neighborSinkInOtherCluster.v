@@ -28,14 +28,14 @@ module tb_neighborSinkInOtherCluster();
 
 	// MEMORY MODULE
 	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
-	wire [`WORD_WIDTH-1:0] address;
+	wire [10:0] address;
 	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);
 
 	// neighborSinkInOtherCluster MODULE
 	reg [`WORD_WIDTH-1:0] MY_CLUSTER_ID;
-	reg done_fixSinkList;
+	reg done_fixSinkList, en;
 	wire forAggregation2, done_neighborSinkInOtherCluster;
-	neighborSinkInOtherCluster nsioc1(clock, nrst, done_fixSinkList, address, wr_en, mem_data_out, MY_CLUSTER_ID, mem_data_in, forAggregation2, done_neighborSinkInOtherCluster);
+	neighborSinkInOtherCluster nsioc1(clock, nrst, en, done_fixSinkList, address, wr_en, mem_data_out, MY_CLUSTER_ID, mem_data_in, forAggregation2, done_neighborSinkInOtherCluster);
 
 	// Clock
 	initial begin
@@ -51,6 +51,7 @@ module tb_neighborSinkInOtherCluster();
 	end
 
 	initial begin
+		en = 1;
 		done_fixSinkList = 1;
 		MY_CLUSTER_ID = 1;
 	end

@@ -1,3 +1,4 @@
+`define WORD_WIDTH 16
 
 /*
  * wr_en Multiplexer (8:1)
