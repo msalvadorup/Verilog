@@ -151,7 +151,7 @@ module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestin
 
 	// reward MODULE
 	wire [`WORD_WIDTH-1:0] reward_out;
-	reward r1(clock, nrst, en, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, addr_7_1, mem_data_out, reward_out, done);
+	reward r1(clock, nrst, en, done_selectMyAction, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, addr_7_1, mem_data_out, reward_out, done);
 
 	reg [2:0] state;
 	always @ (posedge clock) begin
