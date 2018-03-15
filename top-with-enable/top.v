@@ -52,8 +52,9 @@
 `include "reward.v"
 
 
-module top(clock, nrst, en);
+module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID);
 	input clock, nrst, en;
+	input [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID;
 	wire wr_en;
 	// MEMORY MODULE
 	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
@@ -76,7 +77,7 @@ module top(clock, nrst, en);
 
 	// learnCosts MODULE
 	wire done_learnCosts;
-	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon;
+	reg [`WORD_WIDTH-1:0] initial_epsilon;
 	learnCosts lc1(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon, addr_0, wren_0, mem_data_out, mdi_0, done_learnCosts);
 	//*/
 	// amISink MODULE
@@ -84,7 +85,7 @@ module top(clock, nrst, en);
 	amISink ais1(clock, nrst, en, done_learnCosts, addr_1, wren_1, mem_data_out, mdi_1, forAggregation1, done_iamSink);
   
 	// amIDestination MODULE
-	reg [`WORD_WIDTH-1:0] MY_NODE_ID, fdestinationID;
+	reg [`WORD_WIDTH-1:0] MY_NODE_ID;
 	wire iamDestination, done_iamDestination;
 	amIDestination aif1(clock, nrst, en, done_iamSink, MY_NODE_ID, fdestinationID, iamDestination, done_iamDestination);
 	
@@ -122,7 +123,7 @@ module top(clock, nrst, en);
 
 	// WinnerPolicy Module
 	reg start_winnerPolicy;
-	reg [`WORD_WIDTH-1:0] epsilon, epsilon_step;
+	reg [`WORD_WIDTH-1:0] epsilon_step;
 	wire [`WORD_WIDTH-1:0] nexthop;
 	wire done_winnerPolicy;
 	winnerPolicy wp1(clock, nrst, en, done_betterNeighborsInMyCluster, mybest, besthop, bestvalue, bestneighborID, MY_NODE_ID,
@@ -152,12 +153,10 @@ module top(clock, nrst, en);
 	wire [`WORD_WIDTH-1:0] reward_out;
 	reward r1(clock, nrst, en, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, addr_7_1, mem_data_out, reward_out, done);
 
-
-
-
 	reg [2:0] state;
 	always @ (posedge clock) begin
 		if (!nrst) begin
+			initial_epsilon = 7;
 			wren_4 <= 0;
 			//wren_6 <= 0;
 			
@@ -168,13 +167,7 @@ module top(clock, nrst, en);
 			MY_BATTERY_STAT <= 16'h8000;
 			//done_learnCosts <= 1;
 			MY_NODE_ID <= 3;
-			fsourceID <= 1;
-			fbatteryStat <= 1;
-			fValue <= 10;
-			fclusterID <= 1;
-			fdestinationID <= 3;
 			MY_CLUSTER_ID <= 1;
-			epsilon = 2;
 			epsilon_step = 1;
 			state <= 0;
 		end
@@ -182,6 +175,7 @@ module top(clock, nrst, en);
 			case (state)
 				0: begin
 					if (en) begin
+						initial_epsilon = 7;
 						wren_4 <= 0;
 						//wren_6 <= 0;
 						
@@ -192,13 +186,7 @@ module top(clock, nrst, en);
 						MY_BATTERY_STAT <= 16'h8000;
 						//done_learnCosts <= 1;
 						MY_NODE_ID <= 3;
-						fsourceID <= 1;
-						fbatteryStat <= 1;
-						fValue <= 10;
-						fclusterID <= 1;
-						fdestinationID <= 3;
 						MY_CLUSTER_ID <= 1;
-						epsilon = 2;
 						epsilon_step = 1;
 						state <= 1;
 					end

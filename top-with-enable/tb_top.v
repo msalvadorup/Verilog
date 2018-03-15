@@ -7,9 +7,10 @@
 
 module tb_top();	
 	reg clock, nrst, en;
+	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID;
 
 	// Top Module Instantiation
-	top t1(clock, nrst, en);
+	top t1(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID);
 
 	// Clock
 	initial begin
@@ -25,6 +26,23 @@ module tb_top();
 
 		#5 en = 1;
 		#20 en = ~en;
+	end
+
+	initial begin
+		// new neighbor
+		fsourceID = 15;
+		fbatteryStat = 16'b0100000000000000; // 0.5
+		fValue = 16'b0000011010000000; // idk
+		fclusterID = 2;
+		fdestinationID = 3;
+/*
+		// existing neighbor
+		fsourceID = 1;
+		fbatteryStat = 16'b0010000000000000; // 0.25
+		fValue = 16'b0000011010000000; // idk
+		fclusterID = 1;
+		fdestinationID = 3;
+*/
 	end
 
 	integer i;

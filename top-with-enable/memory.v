@@ -37,6 +37,10 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 	// Test Case
 	initial begin
+		// epsilon 
+        memory['h4] = 0; 
+        memory['h5] = 7;
+
 		// FLAGS
 		memory['h0] = 0;
 		memory['h1] = 0;
