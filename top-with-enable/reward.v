@@ -46,24 +46,29 @@ module reward(clock, nrst, en, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop
                     data_out_buf = MY_NODE_ID;
                     state = 3;
                     address_count = 16'h148 + besthop * 2;  // batteryStat address
+                    $display("fsourceID: %d", data_out_buf);
                 end
                 4'd3: begin // fbatteryStat
                     data_out_buf = data_in;
                     state = 4;
                     address_count =  16'h1C8 + besthop * 2; // qValue address
+                    $display("fbatteryStat: %b,%d", data_out_buf, besthop);
                 end
                 4'd4: begin // fValue
                     data_out_buf = data_in;
                     state = 5;
+                    $display("fValue: %b", data_out_buf);
                 end
                 4'd5: begin // fclusterID
                     data_out_buf = MY_CLUSTER_ID;
                     state = 6;
                     address_count = 16'h48 + action * 2; // neighborID address
+                    $display("fclusterID: %d", data_out_buf);
                 end
                 4'd6: begin // fdestinationID
                     data_out_buf = data_in;
                     state = 7;
+                    $display("fdestinationID: %d", data_out_buf);
                 end
                 4'd7: begin
                     done_buf = 0;

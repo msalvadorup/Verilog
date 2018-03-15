@@ -52,7 +52,7 @@
 `include "reward.v"
 
 
-module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID);
+module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID, reward_out, done_reward);
 	input clock, nrst, en;
 	input [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID;
 	wire wr_en;
@@ -150,22 +150,17 @@ module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestin
 	//*/
 
 	// reward MODULE
-	wire [`WORD_WIDTH-1:0] reward_out;
-	reward r1(clock, nrst, en, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, addr_7_1, mem_data_out, reward_out, done);
+	output done_reward;
+	output [`WORD_WIDTH-1:0] reward_out;
+	reward r1(clock, nrst, en, done_selectMyAction, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, addr_7_1, mem_data_out, reward_out, done_reward);
 
 	reg [2:0] state;
 	always @ (posedge clock) begin
 		if (!nrst) begin
 			initial_epsilon = 7;
-			wren_4 <= 0;
-			//wren_6 <= 0;
-			
+			wren_4 <= 0;		
 			mdi_4 <= 0;
-			//mdi_6 <= 0;
-			
-			//start <= 1;
 			MY_BATTERY_STAT <= 16'h8000;
-			//done_learnCosts <= 1;
 			MY_NODE_ID <= 3;
 			MY_CLUSTER_ID <= 1;
 			epsilon_step = 1;
@@ -177,14 +172,8 @@ module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestin
 					if (en) begin
 						initial_epsilon = 7;
 						wren_4 <= 0;
-						//wren_6 <= 0;
-						
 						mdi_4 <= 0;
-						//mdi_6 <= 0;
-						
-						//start <= 1;
-						MY_BATTERY_STAT <= 16'h8000;
-						//done_learnCosts <= 1;
+						MY_BATTERY_STAT <= 16'h5999;//16'h4000; // 16'h8000;
 						MY_NODE_ID <= 3;
 						MY_CLUSTER_ID <= 1;
 						epsilon_step = 1;

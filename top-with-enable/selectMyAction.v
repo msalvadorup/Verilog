@@ -27,14 +27,13 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 			forAggregation_buf = 0;
 			state = 5;
 			address_count = 0;
-			action_buf = 0;
+			action_buf = 16'd65;
 			data_out_buf = 0;
 		end
 		else begin
 			case (state)
 				0: begin
 					if (start) begin
-						action_buf = nexthop;
 						state = 1;
 					end
 					else state = 0;
@@ -43,21 +42,23 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 				1: begin
 					if (nextsinks != 16'd65) begin
 						action_buf = nextsinks;
-						//$display("Send pkt to neighbor sink in my cluster!");
+						$display("Send pkt to neighbor sink in my cluster!");
 					end
 					state = 2;
 				end
 
 				2: begin
-					if (action_buf == 16'd65) begin
+					if (nexthop == 16'd65) begin
 						forAggregation_buf = 1;
 						data_out_buf = 16'h1;
 						address_count = 11'h2; // forAggregation (FLAG) address
 						wr_en_buf = 1;
-						//$display("No better in-cluster head. Schedule aggregation!");
+						$display("No better in-cluster head. Schedule aggregation! %d", action_buf);
 					end
-					else forAggregation_buf = 0;
-
+					else begin 
+						forAggregation_buf = 0;
+						action_buf = nexthop;
+					end
 					state = 3;
 				end
 
@@ -78,7 +79,7 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 						forAggregation_buf = 0;
 						state = 0;
 						address_count = 0;
-						action_buf = 0;
+						action_buf = 16'd65;
 						data_out_buf = 0;
 					end
 					else state = 5;

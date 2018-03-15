@@ -23,6 +23,7 @@ module amISink(clock, nrst, en, start, address, wr_en, data_in, data_out, forAgg
 			done_buf = 0;
 			wr_en_buf = 0;
 			address_count = 11'h0; // amISink (FLAG) address
+			data_out_buf = 16'h0;
 			state = 4;
 		end
 		else begin

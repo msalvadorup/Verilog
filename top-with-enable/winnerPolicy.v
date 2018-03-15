@@ -192,6 +192,7 @@ module winnerPolicy(
 					state <= 10;
 				end
 				5'd10: begin
+					$display("nexthop, one, two, three: %d,%d,%d,%d", nexthop_buf, one, two, three);
 					done_winnerPolicy_buf <= 1;
 					state <= 11;
 				end

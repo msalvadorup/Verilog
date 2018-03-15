@@ -131,8 +131,9 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 
 				4'd5: begin
 					qValue = data_in;
-					
+					$display("MADE IT HERE1");
 					if (qValue <= mybest) begin // fixed-point comparison
+						$display("MADE IT HERE2");
 						betterneighborCount = betterneighborCount + 1;
 						betterneighbors = i;
 						$display("betterneighborCount, betterneighbors: %d, %d", betterneighborCount, betterneighbors);

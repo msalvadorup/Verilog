@@ -1,6 +1,4 @@
 `timescale 1ns/1ps
-`define MEM_DEPTH  2048
-`define MEM_WIDTH  8
 `define WORD_WIDTH 16
 
 `include "top.v"
@@ -8,9 +6,11 @@
 module tb_top();	
 	reg clock, nrst, en;
 	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID;
+	wire done_reward;
+	wire [`WORD_WIDTH-1:0] reward_out;
 
 	// Top Module Instantiation
-	top t1(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID);
+	top t1(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID, reward_out, done_reward);
 
 	// Clock
 	initial begin
@@ -50,10 +50,6 @@ module tb_top();
 	initial begin
 		$dumpfile("tb_top.vcd");
 		$dumpvars(0, tb_top);
-		
-		for (i=0;i<22;i=i+1) begin
-		$display("%X%X", t1.mem1.memory[(i*2)], t1.mem1.memory[(i*2)+1],);
-		end
 
 		#10000
 		$finish;
