@@ -49,7 +49,7 @@
 `include "winnerPolicy.v"
 `include "rngAddress.v"
 `include "selectMyAction.v"
-`include "reward.v"
+//`include "reward.v"
 
 
 module top(clock, nrst, en);
