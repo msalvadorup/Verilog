@@ -20,6 +20,7 @@ module tb_top();
 
 	// Reset
 	initial begin
+		en = 0;
 		nrst = 1;
 		#5 nrst = ~nrst;
 		#25 nrst = ~nrst;
