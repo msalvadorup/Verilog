@@ -7,7 +7,7 @@
 //`include "memory.v"
 
 module tb_learnCosts();
-	reg clock, nrst, en;
+	reg clock, nrst, en;;
 
 	// Memory Module
 	wire wr_en;
