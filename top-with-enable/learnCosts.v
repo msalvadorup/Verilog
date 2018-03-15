@@ -3,13 +3,12 @@
 `define WORD_WIDTH 16
 `define CLOCK_PD 20
 
-module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon, address, wr_en, data_in, data_out, done, state_out);
+module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon, address, wr_en, data_in, data_out, done);
 	input clock, nrst, en;
 	input [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, data_in, initial_epsilon;
 	output done, wr_en;
 	output [10:0] address;
 	output [`WORD_WIDTH-1: 0] data_out;
-	output [4:0] state_out;
 
 	// Registers
 	reg [10:0] address_count;
@@ -240,5 +239,4 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 	assign address = address_count;
 	assign data_out = data_out_buf;
 	assign wr_en = wr_en_buf;
-	assign state_out = state;
 endmodule
