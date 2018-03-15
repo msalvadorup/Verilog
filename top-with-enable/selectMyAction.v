@@ -46,7 +46,7 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 				end
 
 				2: begin
-					if (action_buf == 300) begin
+					if (action_buf == 16'd65) begin
 						forAggregation_buf = 1;
 						data_out_buf = 16'h1;
 						address_count = 11'h2; // forAggregation (FLAG) address

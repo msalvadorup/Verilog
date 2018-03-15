@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `define WORD_WIDTH 16
 
 module fixSinkList(clock, nrst, en, start, address, wr_en, data_in, data_out, done);
@@ -19,6 +20,7 @@ module fixSinkList(clock, nrst, en, start, address, wr_en, data_in, data_out, do
 			done_buf = 0;
 			wr_en_buf = 0;
 			address_count = 11'h68A; // neighborCount address
+			data_out_buf = 16'h0;			
 			state = 12;
 			i = 0; // qValue, sinkIDCount
 			j = 0; // knownSinks, worstHops
@@ -115,17 +117,17 @@ module fixSinkList(clock, nrst, en, start, address, wr_en, data_in, data_out, do
 				8: begin
 					qValue = data_in;
 					state = 9;
-					data_out_buf = qValue + (worstHops - 1); // Update qValue (add worstHops)
+					data_out_buf = qValue + (worstHops + 1); // Update qValue (add worstHops)
 					// address_count = 11'h1C8 + 2*i; // qValue address (write)
 					wr_en_buf = 1;
 				end
 
 				9: begin
-					wr_en_buf = 0;
+					//wr_en_buf = 0;
 					state = 10;
 					data_out_buf = sinkIDCount + 1;
 					address_count = 11'h68E + 2*i;
-					wr_en_buf = 1;
+					//wr_en_buf = 1;
 				end
 
 				10: begin

@@ -66,25 +66,48 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h8 + 8] = 0;
 		memory['h8 + 9] = 205;
 
+		memory['h8 + 10] = 8'b0;
+		memory['h8 + 11] = 8'b0;
+
 		// knownSinkCount
 		memory['h688] = 0;
 		memory['h688 + 1] = 5;
+		
+		// betterneighbors
+		memory['h668 + 0] = 0;
+		memory['h668 + 1] = 0;
+
+		memory['h668 + 2] = 0;
+		memory['h668 + 3] = 0;
+
+		memory['h668 + 4] = 0;
+		memory['h668 + 5] = 0;
+
+		memory['h668 + 6] = 0;
+		memory['h668 + 7] = 0;
+
+		memory['h668 + 8] = 0;
+		memory['h668 + 9] = 0;
+		
+		// betterneighborCount
+		memory['h68C] = 0;
+		memory['h68C + 1] = 0;
 
 		// worstHops
-		memory['h28 + 0] = 0;
-		memory['h28 + 1] = 11;
+		memory['h28 + 0] = 8'b1;
+		memory['h28 + 1] = 8'b01100000;	// 11
 
-		memory['h28 + 2] = 0;
-		memory['h28 + 3] = 3;
+		memory['h28 + 2] = 8'b0;
+		memory['h28 + 3] = 8'b01100000;	// 3
 
-		memory['h28 + 4] = 0;
-		memory['h28 + 5] = 5;
+		memory['h28 + 4] = 8'b0;
+		memory['h28 + 5] = 8'b10100000; // 5
 
-		memory['h28 + 6] = 0;
-		memory['h28 + 7] = 7;
+		memory['h28 + 6] = 8'b0;
+		memory['h28 + 7] = 8'b11100000; // 7
 
-		memory['h28 + 8] = 0;
-		memory['h28 + 9] = 13;
+		memory['h28 + 8] = 8'b1;
+		memory['h28 + 9] = 8'b10100000; // 13
 
 		// neighborCount
 		memory['h68A] = 0;
@@ -114,6 +137,12 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h248 + 0 + 4] = 0;
 		memory['h248 + 0 + 5] = 205;
 
+		memory['h248 + 0 + 6] = 0;
+		memory['h248 + 0 + 7] = 0;
+
+		memory['h248 + 0 + 8] = 0;
+		memory['h248 + 0 + 9] = 0;
+
 
 		memory['h248 + 16 + 0] = 0;
 		memory['h248 + 16 + 1] = 2;
@@ -140,9 +169,27 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h248 + 32 + 4] = 0;
 		memory['h248 + 32 + 5] = 10;
 
+		memory['h248 + 32 + 6] = 0;
+		memory['h248 + 32 + 7] = 0;
+
+		memory['h248 + 32 + 8] = 0;
+		memory['h248 + 32 + 9] = 0;
+
 
 		memory['h248 + 48 + 0] = 0;
 		memory['h248 + 48 + 1] = 2;
+
+		memory['h248 + 48 + 2] = 0;
+		memory['h248 + 48 + 3] = 0;
+
+		memory['h248 + 48 + 4] = 0;
+		memory['h248 + 48 + 5] = 0;
+
+		memory['h248 + 48 + 6] = 0;
+		memory['h248 + 48 + 7] = 0;
+
+		memory['h248 + 48 + 8] = 0;
+		memory['h248 + 48 + 9] = 0;
 
 		// HCM		
 		memory['h648 + 0] = 8'b10110000;	// 5.5
@@ -179,7 +226,7 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h648 + 21] = 8'b0;
 
 
-		/* betterNeighborsInMyCluster
+		//* betterNeighborsInMyCluster
 		// neighborID
 		memory['h48 + 0] = 0;
 		memory['h48 + 1] = 1;
@@ -192,6 +239,9 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 		memory['h48 + 6] = 0;
 		memory['h48 + 7] = 6;
+
+		memory['h48 + 8] = 8'b0;
+		memory['h48 + 9] = 8'b0;
 		
 		// clusterID
 		memory['hC8 + 0] = 0;
@@ -205,6 +255,9 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 		memory['hC8 + 6] = 0;
 		memory['hC8 + 7] = 3;
+
+		memory['hC8 + 8] = 8'b0;
+		memory['hC8 + 9] = 8'b0;
 
 		// qValue
 		memory['h1C8 + 0] = 8'b111;			// 60 /1
@@ -218,23 +271,25 @@ module mem(clock, address, wr_en, data_in, data_out);
 		
 		memory['h1C8 + 6] = 8'b1;			// 10 /6
 		memory['h1C8 + 7] = 8'b01000000;
-		
 
+		memory['h1C8 + 8] = 8'b0;
+		memory['h1C8 + 9] = 8'b0;
+		
 		// batteryStat
 		memory['h148 + 0] = 8'b01000000;	// 0.5
 		memory['h148 + 1] = 8'b00000000;
 
-		memory['h148 + 6] = 8'b10000000;	// 1.0
-		memory['h148 + 7] = 8'b00000000;
+		memory['h148 + 2] = 8'b00000001;	// 0.008
+		memory['h148 + 3] = 8'b00000110;
 
 		memory['h148 + 4] = 8'b01011001;	// 0.7
 		memory['h148 + 5] = 8'b10011001;
 
-		memory['h148 + 2] = 8'b00000001;	// 0.008
-		memory['h148 + 3] = 8'b00000110;
+		memory['h148 + 6] = 8'b10000000;	// 1.0
+		memory['h148 + 7] = 8'b00000000;
 		//*/
 
-		//* fixSinkList, findMyBest testcase
+		/* fixSinkList, findMyBest testcase
 
 		// neighborID
 		memory['h48 + 0] = 0;
@@ -249,6 +304,9 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h48 + 6] = 0;
 		memory['h48 + 7] = 6;
 		
+		memory['h48 + 8] = 8'b0;
+		memory['h48 + 9] = 8'b0;
+
 		// clusterID
 		memory['hC8 + 0] = 0;
 		memory['hC8 + 1] = 9;
@@ -261,6 +319,9 @@ module mem(clock, address, wr_en, data_in, data_out);
 
 		memory['hC8 + 6] = 0;
 		memory['hC8 + 7] = 3;
+
+		memory['hC8 + 8] = 8'b0;
+		memory['hC8 + 9] = 8'b0;
 
 		// qValue
 		memory['h1C8 + 0] = 8'b1;
@@ -275,37 +336,31 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h1C8 + 6] = 8'b111;
 		memory['h1C8 + 7] = 8'b10000000;
 
+		memory['h1C8 + 8] = 8'b0;
+		memory['h1C8 + 9] = 8'b0;
+
 		//*/
 
 
 		/* neighborSinkInOtherCluster testcase
-
 		// neighborID
 		memory['h48 + 0] = 0;
 		memory['h48 + 1] = 3;
-
 		memory['h48 + 2] = 0;
 		memory['h48 + 3] = 1;
-
 		memory['h48 + 4] = 0;
 		memory['h48 + 5] = 10;
-
 		memory['h48 + 6] = 0;
 		memory['h48 + 7] = 6;		
-
 		// clusterID
 		memory['hC8 + 0] = 0;
 		memory['hC8 + 1] = 1;
-
 		memory['hC8 + 2] = 0;
 		memory['hC8 + 3] = 1;
-
 		memory['hC8 + 4] = 0;
 		memory['hC8 + 5] = 2;
-
 		memory['hC8 + 6] = 0;
 		memory['hC8 + 7] = 3;
-
 		//*/
 
 	end

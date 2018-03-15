@@ -27,15 +27,15 @@ module tb_betterNeighborsInMyCluster();
 	wire wr_en;
 	// MEMORY MODULE
 	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
-	wire [`WORD_WIDTH-1:0] address;
+	wire [10:0] address;
 	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);
 	
 	// betterNeighborsInMyCluster MODULE
 	reg [`WORD_WIDTH-1:0] MY_CLUSTER_ID, mybest;
 	wire [`WORD_WIDTH-1:0] besthop, bestvalue, bestneighborID, nextsinks;
-	reg done_findMyBest;
+	reg done_findMyBest, en;
 	wire done_betterNeighborsInMyCluster;
-	betterNeighborsInMyCluster bnimc1(clock, nrst, done_findMyBest, address, wr_en, mem_data_out, MY_CLUSTER_ID, mybest, besthop, bestvalue, bestneighborID, nextsinks, mem_data_in, done_betterNeighborsInMyCluster);
+	betterNeighborsInMyCluster bnimc1(clock, nrst, en, done_findMyBest, address, wr_en, mem_data_out, MY_CLUSTER_ID, mybest, besthop, bestvalue, bestneighborID, nextsinks, mem_data_in, done_betterNeighborsInMyCluster);
 
 	// Clock
 	initial begin
@@ -51,6 +51,7 @@ module tb_betterNeighborsInMyCluster();
 	end
 
 	initial begin
+		en = 1;
 		done_findMyBest = 1;
 		MY_CLUSTER_ID = 1;
 		mybest = 16'b0001000101000000;	// 138

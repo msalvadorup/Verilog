@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `define WORD_WIDTH 16
 
 /* States
@@ -26,6 +27,7 @@ module neighborSinkInOtherCluster(clock, nrst, en, start, address, wr_en, data_i
 			done_buf = 0;
 			wr_en_buf = 0;
 			address_count = 11'h688; // knownSinkCount address
+			data_out_buf = 0;
 			state = 8;
 			i = 0;
 			j = 0;

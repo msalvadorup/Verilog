@@ -28,12 +28,12 @@ module tb_fixSinkList();
 
 	// MEMORY MODULE
 	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
-	wire [`WORD_WIDTH-1:0] address;
+	wire [10:0] address;
 	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);
 	
-	reg done_iamForwarding;
+	reg done_iamDestination, en;
 	wire done_fixSinkList;
-	fixSinkList fsl1(clock, nrst, done_iamForwarding, address, wr_en, mem_data_out, mem_data_in, done_fixSinkList);
+	fixSinkList fsl1(clock, nrst, en, done_iamDestination, address, wr_en, mem_data_out, mem_data_in, done_fixSinkList);
 
 	// Clock
 	initial begin
@@ -49,7 +49,8 @@ module tb_fixSinkList();
 	end
 
 	initial begin
-		done_iamForwarding = 1;
+		en = 1;
+		done_iamDestination = 1;
 	end
 
 	initial begin
