@@ -1,19 +1,19 @@
-`timescale 1ns/1ps
 `define MEM_DEPTH  2048
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
 `define CLOCK_PD 20
 
-module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon, address, wr_en, data_in, data_out, done);
+module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, initial_epsilon, address, wr_en, data_in, data_out, done, state_out);
 	input clock, nrst, en;
 	input [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, data_in, initial_epsilon;
 	output done, wr_en;
 	output [10:0] address;
 	output [`WORD_WIDTH-1: 0] data_out;
+	output [4:0] state_out;
 
 	// Registers
 	reg [10:0] address_count;
-	reg [`WORD_WIDTH-1:0] data_out_buf, neighborCount, neighborCount_buf, knownSinkCount, cur_nID, cur_knownSink, cur_qValue, sinkID_address_buf;
+	reg [`WORD_WIDTH-1:0] data_out_buf, neighborCount, knownSinkCount, cur_nID, cur_knownSink, cur_qValue, sinkID_address_buf;
 	reg done_buf, found, reinit, wr_en_buf;
 	reg [`WORD_WIDTH-1:0] n, k;
 	reg [4:0] state;
@@ -25,8 +25,16 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 			wr_en_buf <= 0;
 			found <= 0;
 			reinit <= 0;
-			n <= 0;
-			k <= 0;
+			n = 0;
+			k = 0;
+			address_count <= 0;
+			data_out_buf = 0;
+			neighborCount <= 0;	
+			knownSinkCount <= 0;
+			cur_nID = 16'd65;
+			cur_knownSink = 16'd65;
+			cur_qValue = 16'd0;
+			sinkID_address_buf = 0;
 		end
 		else begin
 			case (state)
@@ -61,7 +69,7 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 						state <= 5;
 
 						// para hindi multiply nang multiply sa state
-						sinkID_address_buf <= 16'h248 + 16*n;
+						sinkID_address_buf = 16'h248 + 16*n;
 					end
 					else begin
 						n = n + 1;
@@ -86,7 +94,7 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 					cur_knownSink = data_in; // current knownSink
 					data_out_buf = cur_knownSink;
 					address_count <= sinkID_address_buf + k*2;	// sinkIDs address
-					wr_en_buf = 1;
+					wr_en_buf <= 1;
 					state <= 7;
 				end
 				7: begin
@@ -103,7 +111,7 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 				end
 				9: begin
 					wr_en_buf <= 0;
-					address_count = 11'h1C8 + n*2; // qValue address
+					address_count <= 11'h1C8 + n*2; // qValue address
 					state <= 10;
 				end
 				10: begin
@@ -121,7 +129,7 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 				11: begin
 					if (found) begin
 						if (reinit) begin
-							data_out_buf <= initial_epsilon;
+							data_out_buf = initial_epsilon;
 							address_count <= 11'h4;	// epsilon address
 							wr_en_buf <= 1;
 							state <= 20;
@@ -155,10 +163,10 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 					address_count <= 11'hC8 + neighborCount*2;
 					data_out_buf = fclusterID;
 					wr_en_buf <= 1;
-					k <= 0;
+					k = 0;
 
 					// Para hindi multiply nang multiply sa state 16
-					sinkID_address_buf <= 16'h248 + 16*neighborCount;
+					sinkID_address_buf = 16'h248 + 16*neighborCount;
 					
 					state <= 16; 
 				end
@@ -202,13 +210,21 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 				end
 				22: begin	// Idle State
 					if (en) begin
-						state <= 0;
 						done_buf <= 0;
+						state <= 0;
 						wr_en_buf <= 0;
 						found <= 0;
 						reinit <= 0;
-						n <= 0;
-						k <= 0;
+						n = 0;
+						k = 0;
+						address_count <= 0;
+						data_out_buf = 0;
+						neighborCount <= 0;	
+						knownSinkCount <= 0;
+						cur_nID = 16'd65;
+						cur_knownSink = 16'd65;
+						cur_qValue = 16'd0;
+						sinkID_address_buf = 0;
 					end
 					else
 						state <= 22;
@@ -224,4 +240,5 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 	assign address = address_count;
 	assign data_out = data_out_buf;
 	assign wr_en = wr_en_buf;
+	assign state_out = state;
 endmodule
