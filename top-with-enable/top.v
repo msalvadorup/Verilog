@@ -141,25 +141,63 @@ module top(clock, nrst, en);
 	//reward r1(clock, nrst, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, address, data_in, data_out, done);
 
 	// MY_NODE_ID, fdestinationID, MY_CLUSTER_ID
-	initial begin
-		wren_4 <= 0;
-		//wren_6 <= 0;
-		
-		mdi_4 <= 0;
-		//mdi_6 <= 0;
-		
-		//start <= 1;
-		MY_BATTERY_STAT <= 16'h8000;
-		//done_learnCosts <= 1;
-		MY_NODE_ID <= 3;
-		fsourceID <= 1;
-		fbatteryStat <= 1;
-		fValue <= 10;
-		fclusterID <= 1;
-		fdestinationID <= 3;
-		MY_CLUSTER_ID <= 1;
-		epsilon = 2;
-		epsilon_step = 1;
+
+	reg [2:0] state;
+	always @ (posedge clock) begin
+		if (!nrst) begin
+			wren_4 <= 0;
+			//wren_6 <= 0;
+			
+			mdi_4 <= 0;
+			//mdi_6 <= 0;
+			
+			//start <= 1;
+			MY_BATTERY_STAT <= 16'h8000;
+			//done_learnCosts <= 1;
+			MY_NODE_ID <= 3;
+			fsourceID <= 1;
+			fbatteryStat <= 1;
+			fValue <= 10;
+			fclusterID <= 1;
+			fdestinationID <= 3;
+			MY_CLUSTER_ID <= 1;
+			epsilon = 2;
+			epsilon_step = 1;
+			state <= 0;
+		end
+		else begin
+			case (state)
+				0: begin
+					if (en) begin
+						wren_4 <= 0;
+						//wren_6 <= 0;
+						
+						mdi_4 <= 0;
+						//mdi_6 <= 0;
+						
+						//start <= 1;
+						MY_BATTERY_STAT <= 16'h8000;
+						//done_learnCosts <= 1;
+						MY_NODE_ID <= 3;
+						fsourceID <= 1;
+						fbatteryStat <= 1;
+						fValue <= 10;
+						fclusterID <= 1;
+						fdestinationID <= 3;
+						MY_CLUSTER_ID <= 1;
+						epsilon = 2;
+						epsilon_step = 1;
+						state <= 1;
+					end
+					else state <= 0;
+				end
+				1: begin
+					if (done_selectMyAction) state <= 0;
+					else state <= 1;
+				end
+				default: state <= 0;
+			endcase
+		end
 	end
 
 	// Address Selection
