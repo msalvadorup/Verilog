@@ -26,6 +26,9 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 			wr_en_buf = 0;
 			forAggregation_buf = 0;
 			state = 5;
+			address_count = 0;
+			action_buf = 0;
+			data_out_buf = 0;
 		end
 		else begin
 			case (state)
@@ -74,6 +77,9 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 						wr_en_buf = 0;
 						forAggregation_buf = 0;
 						state = 0;
+						address_count = 0;
+						action_buf = 0;
+						data_out_buf = 0;
 					end
 					else state = 5;
 				end
