@@ -49,7 +49,7 @@
 `include "winnerPolicy.v"
 `include "rngAddress.v"
 `include "selectMyAction.v"
-//`include "reward.v"
+`include "reward.v"
 
 
 module top(clock, nrst, en);
@@ -130,17 +130,30 @@ module top(clock, nrst, en);
 						rng_address, start_rngAddress, done_rngAddress, betterNeighborCount, which
 	);
 
+	// reward ~ selectMyAction Mux Address
+	reg [`WORD_WIDTH-1:0] selectMyAddress;
+	reg [10:0] addr_7_buf;
+	wire [10:0] addr_7_1, addr_7_0;
+	always @ (*) begin
+		if (done_selectMyAction)
+			addr_7_buf = addr_7_1;	// reward 
+		else
+			addr_7_buf = addr_7_0;	// selectMyAction
+	end
+	assign addr_7 = addr_7_buf;
+
 	// selectMyAction MODULE
 	wire [`WORD_WIDTH-1:0] action;
 	wire forAggregation3, done_selectMyAction;
-	selectMyAction sma1(clock, nrst, en, done_winnerPolicy, addr_7, wren_7, nexthop, nextsinks, action, mdi_7, forAggregation3, done_selectMyAction);
+	selectMyAction sma1(clock, nrst, en, done_winnerPolicy, addr_7_0, wren_7, nexthop, nextsinks, action, mdi_7, forAggregation3, done_selectMyAction);
 	//*/
 
 	// reward MODULE
+	wire [`WORD_WIDTH-1:0] reward_out;
+	reward r1(clock, nrst, en, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, addr_7_1, mem_data_out, reward_out, done);
 
-	//reward r1(clock, nrst, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop, address, data_in, data_out, done);
 
-	// MY_NODE_ID, fdestinationID, MY_CLUSTER_ID
+
 
 	reg [2:0] state;
 	always @ (posedge clock) begin
