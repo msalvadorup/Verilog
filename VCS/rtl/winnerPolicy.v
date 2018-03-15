@@ -39,11 +39,11 @@ module winnerPolicy(
 	reg [`WORD_WIDTH-1:0] betterNeighborCount_buf, rng_address_temp;
 	reg wr_en_buf, done_winnerPolicy_buf, en_rng_buf, start_rngAddress_buf;
 	reg one, two, three;
-	reg [15:0] nineninenine, onezerozeroone;
+	//reg [15:0] nineninenine, onezerozeroone;
 	reg [31:0] _right3, _right2, _left, _right;
 	reg [31:0] mybest_shifted;
 
-	reg [4:0] state;
+	reg [3:0] state;
 	always @ (posedge clock) begin
 		if (!nrst) begin
 			state <= 11;	// Idle State
@@ -52,8 +52,23 @@ module winnerPolicy(
 			done_winnerPolicy_buf <= 0;
 			nexthop_buf <= 16'd65;     // 65 = -1 for the lack of representation on negative numbers
 			start_rngAddress_buf <= 0;
-			nineninenine <= 16'b1111111110111110;   	// 0.999 in binary fraction ~ 0.998992919921875 0.16
-			onezerozeroone <= 16'b1000000000100000;    	// 0.001 in binary fraction ~ 0.001007080078125	1.15
+			//nineninenine <= 16'b1111111110111110;   	// 0.999 in binary fraction ~ 0.998992919921875 0.16
+			//onezerozeroone <= 16'b1000000000100000;    	// 0.001 in binary fraction ~ 0.001007080078125	1.15
+			address_count <= 10'd0;
+			betterNeighborCount_buf <= 16'd0;
+			which_buf <= 0;
+			explore_constant <= 16'd0;
+			epsilon_buf <= 16'd0;
+			data_out_buf <= 16'd0;
+			rng_address_temp = 16'd0;
+			one <= 0;
+			two <= 0;
+			three <= 0;
+			_right3 = 32'd0;
+			_right2 = 32'd0;
+			_left = 32'd0;
+			_right = 32'd0;
+			mybest_shifted = 32'd0; 
 		end
 		else begin
 			case (state)
@@ -124,11 +139,11 @@ module winnerPolicy(
 					/*
 					 *  [15:0] bestvalue   - 11 bits whole, 5 bits fraction
 					 *  [15:0] mybest      - 11 bits whole, 5 bits fraction
-					 *  [15:0] nineninenine  - 16 bits fraction
+					 *  [15:0] nineninenine  - 16 bits fraction      16'b1111111110111110
 					 *  _left, _right = 11 bits whole, 21 bits fraction
 					 */
 					_left = {bestvalue, 16'b0};
-					_right = mybest * nineninenine;
+					_right = mybest * 16'b1111111110111110;
 					state <= 6;
 				end
 				5'd6: begin
@@ -149,10 +164,10 @@ module winnerPolicy(
 					/*
 					 *  [15:0] bestvalue   - 11 bits whole, 5 bits fraction
 					 *  [15:0] mybest      - 11 bits whole, 5 bits fraction
-					 *  [15:0] onezerozeroone - 1 bit whole, 15 bits fraction
+					 *  [15:0] onezerozeroone - 1 bit whole, 15 bits fraction  16'b1000000000100000
 					 *  _left, _right2 = 12 bits whole, 20 bits fraction
 					 */
-					_right2 = mybest * onezerozeroone; // 12 bits whole, 20 bits fraction 
+					_right2 = mybest * 16'b1000000000100000; // 12 bits whole, 20 bits fraction 
 					mybest_shifted = {mybest, 15'b0};
 					_right3 = _right2 + mybest_shifted;
 					state <= 8;
@@ -171,10 +186,10 @@ module winnerPolicy(
 					state <= 9;
 				end
 				5'd9: begin
-					if (one & two & three) begin
+					if (one & two & three)
 						nexthop_buf <= besthop;
-					end
-						state <= 10;
+					
+					state <= 10;
 				end
 				5'd10: begin
 					done_winnerPolicy_buf <= 1;
@@ -182,13 +197,29 @@ module winnerPolicy(
 				end
 				5'd11: begin
 					if (en) begin
-						state <= 0;
-						done_winnerPolicy_buf <= 0;
+						state <= 0;	// Idle State
+						wr_en_buf <= 0;
 						en_rng_buf <= 0;
-						nexthop_buf <= 65;     // 65 = -1 for the lack of representation for negative numbers
+						done_winnerPolicy_buf <= 0;
+						nexthop_buf <= 16'd65;     // 65 = -1 for the lack of representation on negative numbers
 						start_rngAddress_buf <= 0;
-						nineninenine <= 16'b1111111110111110;   	// 0.999 in binary fraction ~ 0.998992919921875 0.16
-						onezerozeroone <= 16'b1000000000100000;    	// 0.001 in binary fraction ~ 0.001007080078125	1.15
+						//nineninenine <= 16'b1111111110111110;   	// 0.999 in binary fraction ~ 0.998992919921875 0.16
+						//onezerozeroone <= 16'b1000000000100000;    	// 0.001 in binary fraction ~ 0.001007080078125	1.15
+						address_count <= 10'd0;
+						betterNeighborCount_buf <= 16'd0;
+						which_buf <= 0;
+						explore_constant <= 16'd0;
+						epsilon_buf <= 16'd0;
+						data_out_buf <= 16'd0;
+						rng_address_temp = 16'd0;
+						one <= 0;
+						two <= 0;
+						three <= 0;
+						_right3 = 32'd0;
+						_right2 = 32'd0;
+						_left = 32'd0;
+						_right = 32'd0;
+						mybest_shifted = 32'd0;
 					end
 					else state <= 11;
 				end

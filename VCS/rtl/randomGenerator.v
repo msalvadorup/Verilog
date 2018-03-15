@@ -18,6 +18,7 @@ module randomGenerator(clock, nrst, rng_out, rng_out_4bit, en_rng, done);
 			rng_out_buf = 5;
 			state = 0;
 			feedback = 0;
+			done_buf = 0;
 		end
 		else begin
 			case (state)

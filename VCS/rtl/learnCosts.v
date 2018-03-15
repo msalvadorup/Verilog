@@ -13,7 +13,7 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 
 	// Registers
 	reg [10:0] address_count;
-	reg [`WORD_WIDTH-1:0] data_out_buf, neighborCount, neighborCount_buf, knownSinkCount, cur_nID, cur_knownSink, cur_qValue, sinkID_address_buf;
+	reg [`WORD_WIDTH-1:0] data_out_buf, neighborCount, knownSinkCount, cur_nID, cur_knownSink, cur_qValue, sinkID_address_buf;
 	reg done_buf, found, reinit, wr_en_buf;
 	reg [`WORD_WIDTH-1:0] n, k;
 	reg [4:0] state;
@@ -27,6 +27,14 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 			reinit <= 0;
 			n = 0;
 			k = 0;
+			address_count <= 0;
+			data_out_buf = 0;
+			neighborCount <= 0;	
+			knownSinkCount <= 0;
+			cur_nID = 16'd65;
+			cur_knownSink = 16'd65;
+			cur_qValue = 16'd0;
+			sinkID_address_buf = 0;
 		end
 		else begin
 			case (state)
@@ -61,7 +69,7 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 						state <= 5;
 
 						// para hindi multiply nang multiply sa state
-						sinkID_address_buf <= 16'h248 + 16*n;
+						sinkID_address_buf = 16'h248 + 16*n;
 					end
 					else begin
 						n = n + 1;
@@ -158,7 +166,7 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 					k = 0;
 
 					// Para hindi multiply nang multiply sa state 16
-					sinkID_address_buf <= 16'h248 + 16*neighborCount;
+					sinkID_address_buf = 16'h248 + 16*neighborCount;
 					
 					state <= 16; 
 				end
@@ -202,13 +210,21 @@ module learnCosts(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, 
 				end
 				22: begin	// Idle State
 					if (en) begin
-						state <= 0;
 						done_buf <= 0;
+						state <= 0;
 						wr_en_buf <= 0;
 						found <= 0;
 						reinit <= 0;
 						n = 0;
 						k = 0;
+						address_count <= 0;
+						data_out_buf = 0;
+						neighborCount <= 0;	
+						knownSinkCount <= 0;
+						cur_nID = 16'd65;
+						cur_knownSink = 16'd65;
+						cur_qValue = 16'd0;
+						sinkID_address_buf = 0;
 					end
 					else
 						state <= 22;
