@@ -226,7 +226,7 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h648 + 21] = 8'b0;
 
 
-		/* betterNeighborsInMyCluster
+		//* betterNeighborsInMyCluster
 		// neighborID
 		memory['h48 + 0] = 0;
 		memory['h48 + 1] = 1;
@@ -289,7 +289,7 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h148 + 7] = 8'b00000000;
 		//*/
 
-		//* fixSinkList, findMyBest testcase
+		/* fixSinkList, findMyBest testcase
 
 		// neighborID
 		memory['h48 + 0] = 0;
