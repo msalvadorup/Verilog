@@ -43,6 +43,11 @@ lc:
 	vvp tb_learnCosts
 	gtkwave tb_learnCosts.vcd	
 
+sma:
+	iverilog -o tb_selectMyAction tb_selectMyAction.v
+	vvp tb_selectMyAction
+	gtkwave tb_selectMyAction.vcd	
+
 clean:
 	rm -f a.out
 	rm -f tb_top

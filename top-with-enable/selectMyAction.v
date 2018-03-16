@@ -3,7 +3,7 @@
 /* Possible Actions
  * random hop (explore hop)
  * besthop
- * nextsink
+ * nextsink (sink in cluster)
  * self (CH role)
  */
 
@@ -39,7 +39,7 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 					else state = 0;
 				end
 
-				1: begin
+				1: begin //***Offset is passed instead of nID? If action is self, reward.v attaches wrong dest. Also, wider.
 					if (nextsinks != 16'd65) begin
 						action_buf = nextsinks;
 						$display("Send pkt to neighbor sink in my cluster!");
@@ -48,7 +48,7 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 				end
 
 				2: begin
-					if (nexthop == 16'd65) begin
+					if (nexthop == 16'd65 && nextsinks == 16'd65) begin
 						forAggregation_buf = 1;
 						data_out_buf = 16'h1;
 						address_count = 11'h2; // forAggregation (FLAG) address
