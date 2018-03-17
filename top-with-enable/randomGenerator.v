@@ -10,7 +10,6 @@ module randomGenerator(clock, nrst, rng_out, rng_out_4bit, en_rng, done);
 	reg [15:0] rng_out_buf;
 	reg feedback, done_buf;
 	output done;//, feedback_out;
-	//output [2:0] state_out;
 
 	// RNG
 	reg [2:0] state;
@@ -50,6 +49,4 @@ module randomGenerator(clock, nrst, rng_out, rng_out_4bit, en_rng, done);
 	assign rng_out = rng_out_buf;
 	assign rng_out_4bit = {12'd0, rng_out_buf[3:0]};
 	assign done = done_buf;
-	//assign feedback_out = feedback;
-	assign state_out = state;
 endmodule
