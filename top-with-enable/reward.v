@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `define WORD_WIDTH 16
 
 //fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID

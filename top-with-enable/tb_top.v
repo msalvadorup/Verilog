@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 `define WORD_WIDTH 16
 
-`include "top.v"
+//`include "top.v"
 
 module tb_top();	
 	reg clock, nrst, en;
@@ -46,10 +46,11 @@ module tb_top();
 */
 	end
 
-	integer i;
 	initial begin
-		$dumpfile("tb_top.vcd");
-		$dumpvars(0, tb_top);
+		//$dumpfile("tb_top.vcd");
+		//$dumpvars(0, tb_top);
+        	$vcdplusfile("tb_top.vpd"); //$dumpfile("tb_randomGenerator.vcd");
+        	$vcdpluson;
 
 		#10000
 		$finish;

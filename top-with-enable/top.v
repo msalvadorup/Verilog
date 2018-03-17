@@ -34,6 +34,7 @@
 				2. Ilagay sa registers at initialize sa nrst or enable
  */
 
+/*
 `include "memory.v"
 `include "mux_11bit.v"
 `include "mux_16bit.v"
@@ -50,7 +51,7 @@
 `include "rngAddress.v"
 `include "selectMyAction.v"
 `include "reward.v"
-
+*/
 
 module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID, reward_out, done_reward);
 	input clock, nrst, en;
@@ -122,7 +123,6 @@ module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestin
 	rngAddress rad1(clock, nrst, start_rngAddress, betterNeighborCount, which, rng_address, done_rngAddress);
 
 	// WinnerPolicy Module
-	reg start_winnerPolicy;
 	reg [`WORD_WIDTH-1:0] epsilon_step;
 	wire [`WORD_WIDTH-1:0] nexthop;
 	wire done_winnerPolicy;
@@ -132,9 +132,9 @@ module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestin
 	);
 
 	// reward ~ selectMyAction Mux Address
-	reg [`WORD_WIDTH-1:0] selectMyAddress;
 	reg [10:0] addr_7_buf;
 	wire [10:0] addr_7_1, addr_7_0;
+	wire done_selectMyAction;
 	always @ (*) begin
 		if (done_selectMyAction)
 			addr_7_buf = addr_7_1;	// reward 
@@ -145,7 +145,7 @@ module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestin
 
 	// selectMyAction MODULE
 	wire [`WORD_WIDTH-1:0] action;
-	wire forAggregation3, done_selectMyAction;
+	wire forAggregation3;
 	selectMyAction sma1(clock, nrst, en, done_winnerPolicy, addr_7_0, wren_7, nexthop, nextsinks, action, mdi_7, forAggregation3, done_selectMyAction);
 	//*/
 
