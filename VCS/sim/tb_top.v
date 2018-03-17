@@ -1,8 +1,8 @@
 `timescale 1ns/1ps
 `define WORD_WIDTH 16
 
-`include "top.v"
-`include "memory.v"
+//`include "top.v"
+//`include "memory.v"
 
 module tb_top();	
 	reg clock, nrst, en;
@@ -54,12 +54,13 @@ module tb_top();
 	end
 
 	initial begin
-		$dumpfile("tb_top.vcd");
-		$dumpvars(0, tb_top);
-        //$vcdplusfile("tb_top.vpd"); //$dumpfile("tb_randomGenerator.vcd");
-        //$vcdpluson;
-
+	//	$dumpfile("tb_top.vcd");
+	//	$dumpvars(0, tb_top);
+        	$vcdplusfile("tb_top.vpd"); //$dumpfile("tb_randomGenerator.vcd");
+        	$vcdpluson;
+		$sdf_annotate("../mapped/top.sdf", top);
 		#10000
 		$finish;
 	end
 endmodule
+

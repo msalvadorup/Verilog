@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `define MEM_DEPTH  2048
 `define MEM_WIDTH  8
 `define WORD_WIDTH 16
@@ -36,7 +37,13 @@ module mem(clock, address, wr_en, data_in, data_out);
 	//end
 
 	// Test Case
+	integer i;
 	initial begin
+		// Zero Coating
+		for (i = 0; i < 2048; i=i+1) begin
+			memory[i] = 0;
+		end
+
 		// epsilon 
         memory['h4] = 0; 
         memory['h5] = 7;

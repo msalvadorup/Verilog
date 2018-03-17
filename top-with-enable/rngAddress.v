@@ -1,9 +1,9 @@
+`timescale 1ns/1ps
 module rngAddress(clock, nrst, start_rng_address, betterNeighborCount, which, rng_address, done_rng_address);
 	input clock, nrst, start_rng_address;
 	input [15:0] betterNeighborCount, which;
 	output [15:0] rng_address;
 	output done_rng_address;
-	//output [2:0] state_out;
 
 	reg [15:0] rng_address_buf;
 	reg [2:0] state;
@@ -43,5 +43,4 @@ module rngAddress(clock, nrst, start_rng_address, betterNeighborCount, which, rn
 
 	assign rng_address = rng_address_buf;
 	assign done_rng_address = done_rng_address_buf;
-	assign state_out = state;
 endmodule

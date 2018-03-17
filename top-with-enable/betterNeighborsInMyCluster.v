@@ -67,6 +67,15 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 			i = 0; // neighbors index
 			j = 0; // knownSinks index
 			k = 0; // HCM idex
+			HCM = 0;
+			batteryStat = 0;
+			clusterID = 0;
+			fpTemp = 0;
+			knownSinkCount = 0;
+			knownSinks = 0;
+			neighborCount = 0;
+			neighborID = 0;
+			qValue = 0;
 		end
 		else begin
 			case (state)
@@ -251,6 +260,15 @@ module betterNeighborsInMyCluster(clock, nrst, en, start, address, wr_en, data_i
 						i = 0;
 						j = 0;
 						k = 0;
+						HCM = 0;
+						batteryStat = 0;
+						clusterID = 0;
+						fpTemp = 0;
+						knownSinkCount = 0;
+						knownSinks = 0;
+						neighborCount = 0;
+						neighborID = 0;
+						qValue = 0;
 					end
 					else state = 4'd15; 
 				end

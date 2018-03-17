@@ -25,6 +25,13 @@ module fixSinkList(clock, nrst, en, start, address, wr_en, data_in, data_out, do
 			i = 0; // qValue, sinkIDCount
 			j = 0; // knownSinks, worstHops
 			k = 0; // sinkID_index
+			knownSinkCount = 0;
+			knownSinks = 0;
+			neighborCount = 0;
+			qValue = 0;
+			sinkIDCount = 0;
+			sinkIDs = 0;
+			worstHops = 0;
 		end
 		else begin
 			case (state)
@@ -96,7 +103,7 @@ module fixSinkList(clock, nrst, en, start, address, wr_en, data_in, data_out, do
 							$display("Append knownSink to sinkIDs");
 						end
 						else begin
-							// state = 5;
+							state = 5;
 							address_count = 11'h248 + 16*i + 2*k; // sinkIDs address
 						end
 					end
@@ -168,6 +175,13 @@ module fixSinkList(clock, nrst, en, start, address, wr_en, data_in, data_out, do
 						i = 0; // qValue, sinkIDCount
 						j = 0; // knownSinks, worstHops
 						k = 0; // sinkID_index
+						knownSinkCount = 0;
+						knownSinks = 0;
+						neighborCount = 0;
+						qValue = 0;
+						sinkIDCount = 0;
+						sinkIDs = 0;
+						worstHops = 0;
 					end
 					else state = 12;
 				end

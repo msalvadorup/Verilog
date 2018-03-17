@@ -31,6 +31,11 @@ module neighborSinkInOtherCluster(clock, nrst, en, start, address, wr_en, data_i
 			state = 8;
 			i = 0;
 			j = 0;
+			clusterID = 0;
+			knownSinkCount = 0;
+			knownSinks = 0;
+			neighborCount = 0;
+			neighborID = 0;
 		end
 		else begin
 			case (state)
@@ -117,6 +122,11 @@ module neighborSinkInOtherCluster(clock, nrst, en, start, address, wr_en, data_i
 						state = 0;
 						i = 0;
 						j = 0;
+						clusterID = 0;
+						knownSinkCount = 0;
+						knownSinks = 0;
+						neighborCount = 0;
+						neighborID = 0;
 					end
 					else state = 8;
 				end

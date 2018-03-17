@@ -193,42 +193,43 @@ module top(clock, nrst, en, address, wr_en, mem_data_in, mem_data_out, fsourceID
 	always @ (*) begin
 
 		if (!done_learnCosts) begin
-			addr_select <= 0;
-			wr_select <= 0;
+			addr_select = 3'd0;
+			wr_select = 3'd0;
 		end
 
-		else if (done_learnCosts && !done_iamSink) begin
-			addr_select <= 1;
-			wr_select <= 1;
+		else if (done_learnCosts && !done_iamDestination) begin //!done_iamSink) begin
+			addr_select = 3'd1;
+			wr_select = 3'd1;
 		end
 
 		else if (done_iamDestination && !done_fixSinkList) begin
-			addr_select <= 2;
-			wr_select <= 2;
+			addr_select = 3'd2;
+			wr_select = 3'd2;
 		end
 
 		else if (done_fixSinkList && !done_neighborSinkInOtherCluster) begin
-			addr_select <= 3;
-			wr_select <= 3;
+			addr_select = 3'd3;
+			wr_select = 3'd3;
 		end
 		
 		else if (done_neighborSinkInOtherCluster && !done_findMyBest) begin
-			addr_select <= 4;
+			addr_select = 3'd4;
 		end
 		
 		else if (done_findMyBest && !done_betterNeighborsInMyCluster) begin
-			addr_select <= 5;
-			wr_select <= 5;
+			addr_select = 3'd5;
+			wr_select = 3'd5;
 		end
 		
 		else if (done_betterNeighborsInMyCluster && !done_winnerPolicy) begin
-			addr_select <= 6;
+			addr_select = 3'd6;
 		end
 		
 		else if (done_winnerPolicy && !done_selectMyAction) begin
-			addr_select <= 7;
-			wr_select <= 7;
+			addr_select = 3'd7;
+			wr_select = 3'd7;
 		end
 	end
 
 endmodule
+

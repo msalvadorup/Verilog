@@ -68,3 +68,7 @@ clean:
 	rm -f tb_winnerPolicy
 	rm -f tb_learnCosts.vcd
 	rm -f tb_learnCosts
+
+utop:
+	vcs memory.v mux_11bit.v mux_16bit.v mux_1bit.v learnCosts.v amISink.v amIDestination.v fixSinkList.v neighborSinkInOtherCluster.v findMyBest.v betterNeighborsInMyCluster.v randomGenerator.v winnerPolicy.v rngAddress.v selectMyAction.v reward.v top.v tb_top.v -full64 -debug_pp +neg_tchk -R -l top_unsynth.log
+	./simv

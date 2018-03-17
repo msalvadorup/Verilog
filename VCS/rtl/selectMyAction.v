@@ -26,21 +26,21 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 			done_buf = 0;
 			wr_en_buf = 0;
 			forAggregation_buf = 0;
-			state = 5;
+			state = 3'd5;
 			address_count = 0;
 			action_buf = 16'd65;
 			data_out_buf = 0;
 		end
 		else begin
 			case (state)
-				0: begin
+				3'd0: begin
 					if (start) begin
 						state = 1;
 					end
 					else state = 0;
 				end
 
-				1: begin //***Offset is passed instead of nID? If action is self, reward.v attaches wrong dest. Also, wider.
+				3'd1: begin //***Offset is passed instead of nID? If action is self, reward.v attaches wrong dest. Also, wider.
 					if (nextsinks != 16'd65) begin
 						action_buf = nextsinks;
 						$display("Send pkt to neighbor sink in my cluster!");
@@ -48,7 +48,7 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 					state = 2;
 				end
 
-				2: begin
+				3'd2: begin
 					if (nexthop == 16'd65 && nextsinks == 16'd65) begin
 						forAggregation_buf = 1;
 						data_out_buf = 16'h1;
@@ -63,17 +63,17 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 					state = 3;
 				end
 
-				3: begin
+				3'd3: begin
 					wr_en_buf = 0;
 					state = 4;
 				end
 
-				4: begin
+				3'd4: begin
 					done_buf = 1;
-					state = 5;
+					state = 3'd5;
 				end
 
-				5: begin
+				3'd5: begin
 					if (en) begin
 						done_buf = 0;
 						wr_en_buf = 0;
