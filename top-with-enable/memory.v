@@ -37,7 +37,13 @@ module mem(clock, address, wr_en, data_in, data_out);
 	//end
 
 	// Test Case
+	integer i;
 	initial begin
+		// Zero Coating
+		for (i = 0; i < 2048; i=i+1) begin
+			memory[i] = 0;
+		end
+
 		// epsilon 
         memory['h4] = 0; 
         memory['h5] = 7;
