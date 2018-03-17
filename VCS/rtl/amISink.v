@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `define WORD_WIDTH 16
 
 /*  Register bank
@@ -23,7 +24,9 @@ module amISink(clock, nrst, en, start, address, wr_en, data_in, data_out, forAgg
 			done_buf = 0;
 			wr_en_buf = 0;
 			address_count = 11'h0; // amISink (FLAG) address
+			data_out_buf = 16'h0;
 			state = 4;
+			amISink = 0;
 		end
 		else begin
 			case (state)
@@ -68,6 +71,7 @@ module amISink(clock, nrst, en, start, address, wr_en, data_in, data_out, forAgg
 						wr_en_buf = 0;
 						address_count = 11'h0; // amISink (FLAG) address
 						state = 0;
+						amISink = 0;
 					end
 					else state = 4;
 				end
