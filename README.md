@@ -2,14 +2,19 @@
 Verilog dumps
 
 # Todo
-* Idle State for Top Module			
-* Enable for the Top Module
-* Separate Multiplication Module
-* fix findMyBest state transition
-* fix betterNeighborsInMyCluster
+* Reward Module 
+	
+	Wag magaccess ng memory kapag 65 yung action for destination
 
-# Todo2
-* 1 Multiplcation per clock
+* ML Module Reset
+
+	Reset after forAggregation
+
+* Reset memory values after enable/ after done_reward
+
+	* forAggregation
+	* betterNeighbors?
+	* others
 
 # Attribution
 Part of this project is derived from Feedback Framework 3 of Anna Förster which is licensed under GPLv3.0 by University of Lugano (2008).
