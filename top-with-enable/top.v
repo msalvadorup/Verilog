@@ -34,6 +34,8 @@
 				2. Ilagay sa registers at initialize sa nrst or enable
  */
 
+/*
+`include "memory.v"
 `include "mux_11bit.v"
 `include "mux_16bit.v"
 `include "mux_1bit.v"
@@ -49,18 +51,17 @@
 `include "rngAddress.v"
 `include "selectMyAction.v"
 `include "reward.v"
+*/
 
-
-module top(clock, nrst, en, address, wr_en, mem_data_in, mem_data_out, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID, reward_out, done_reward);
+module top(clock, nrst, en, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID, reward_out, done_reward);
 	input clock, nrst, en;
 	input [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID;
-
-	// MEMORY MODULE CONNECTIONS
-	input [`WORD_WIDTH-1:0] mem_data_out;
-	output [10:0] address;
-	output [`WORD_WIDTH-1:0] mem_data_in;
-	output wr_en;
-
+	wire wr_en;
+	// MEMORY MODULE
+	wire [`WORD_WIDTH-1:0] mem_data_in, mem_data_out; 
+	wire [10:0] address;
+	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);
+	
 	// MUX MODULE
 	reg [2:0] addr_select, wr_select;
 	
