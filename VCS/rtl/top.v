@@ -225,7 +225,7 @@ module top(clock, nrst, en, address, wr_en, mem_data_in, mem_data_out, fsourceID
 			addr_select = 3'd6;
 		end
 		
-		else if (done_winnerPolicy && !done_selectMyAction) begin
+		else if (done_winnerPolicy && !done_reward) begin
 			addr_select = 3'd7;
 			wr_select = 3'd7;
 		end

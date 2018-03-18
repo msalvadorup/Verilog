@@ -1544,14 +1544,14 @@ module amISink ( clock, nrst, en, start, address, wr_en, data_in, data_out,
   INVX0 U19 ( .INP(n27), .ZN(n11) );
   INVX0 U20 ( .INP(n18), .ZN(n6) );
   INVX0 U21 ( .INP(data_in[0]), .ZN(n1) );
-  INVX0 U22 ( .INP(en), .ZN(n14) );
-  NOR2X0 U23 ( .IN1(n28), .IN2(n2), .QN(N55) );
-  NAND2X1 U24 ( .IN1(n10), .IN2(n8), .QN(n30) );
-  NOR2X0 U25 ( .IN1(n19), .IN2(n2), .QN(n20) );
-  NOR2X0 U26 ( .IN1(n11), .IN2(n22), .QN(n23) );
-  OA21X1 U27 ( .IN1(n7), .IN2(data_out[0]), .IN3(nrst), .Q(n38) );
-  INVX0 U28 ( .INP(n16), .ZN(n4) );
-  INVX0 U29 ( .INP(N52), .ZN(n3) );
+  INVX0 U22 ( .INP(N52), .ZN(n3) );
+  INVX0 U23 ( .INP(en), .ZN(n14) );
+  NOR2X0 U24 ( .IN1(n28), .IN2(n2), .QN(N55) );
+  NAND2X1 U25 ( .IN1(n10), .IN2(n8), .QN(n30) );
+  NOR2X0 U26 ( .IN1(n19), .IN2(n2), .QN(n20) );
+  NOR2X0 U27 ( .IN1(n11), .IN2(n22), .QN(n23) );
+  OA21X1 U28 ( .IN1(n7), .IN2(data_out[0]), .IN3(nrst), .Q(n38) );
+  INVX0 U29 ( .INP(n16), .ZN(n4) );
   NOR2X0 U30 ( .IN1(n9), .IN2(state[2]), .QN(n21) );
   NAND2X1 U31 ( .IN1(n9), .IN2(n10), .QN(n24) );
   NAND2X1 U32 ( .IN1(n21), .IN2(n10), .QN(n18) );
@@ -5224,9 +5224,9 @@ module findMyBest ( clock, nrst, en, start, address, data_in, MY_BATTERY_STAT,
   NOR2X0 U35 ( .IN1(n51), .IN2(n211), .QN(n43) );
   NOR2X0 U36 ( .IN1(n86), .IN2(n211), .QN(n87) );
   NOR2X0 U37 ( .IN1(n211), .IN2(n100), .QN(n96) );
-  AND2X1 U38 ( .IN1(n2), .IN2(n96), .Q(n204) );
-  OR3X1 U39 ( .IN1(n97), .IN2(n267), .IN3(n98), .Q(n2) );
-  OA21X1 U40 ( .IN1(n47), .IN2(n48), .IN3(n49), .Q(n37) );
+  OA21X1 U38 ( .IN1(n47), .IN2(n48), .IN3(n49), .Q(n37) );
+  AND2X1 U39 ( .IN1(n2), .IN2(n96), .Q(n204) );
+  OR3X1 U40 ( .IN1(n97), .IN2(n267), .IN3(n98), .Q(n2) );
   NAND2X1 U41 ( .IN1(nrst), .IN2(n73), .QN(n47) );
   INVX0 U42 ( .INP(n100), .ZN(n260) );
   INVX0 U43 ( .INP(N154), .ZN(n270) );
@@ -10569,11 +10569,12 @@ module selectMyAction ( clock, nrst, en, start, address, wr_en, nexthop,
   output [15:0] data_out;
   input clock, nrst, en, start;
   output wr_en, forAggregation, done;
-  wire   N72, N92, n10, n11, n12, n17, n18, n19, n20, n21, n22, n23, n24, n25,
-         n26, n27, n28, n29, n30, n31, n32, n33, n34, n35, n36, n37, n38, n39,
-         n40, n41, n42, n44, n45, n46, n47, n48, n49, n50, n51, n52, n53, n54,
-         n55, n56, n57, n58, n59, n60, n61, n62, n63, n64, n65, n66, n67, n1,
-         n2, n3, n4, n5, n6, n7, n8, n9, n13, n14, n15, n16;
+  wire   N98, n10, n11, n12, n17, n18, n19, n20, n21, n22, n23, n24, n25, n26,
+         n27, n28, n29, n30, n31, n32, n33, n34, n35, n36, n37, n38, n39, n40,
+         n41, n42, n43, n44, n45, n46, n47, n48, n49, n50, n51, n52, n53, n54,
+         n55, n56, n57, n58, n59, n60, n61, n62, n63, n64, n65, n66, n67, n68,
+         n69, n70, n71, n1, n2, n3, n4, n5, n6, n7, n8, n9, n13, n14, n15, n16
+;
   wire   [2:0] state;
   assign address[10] = 1'b0;
   assign address[9] = 1'b0;
@@ -10601,123 +10602,126 @@ module selectMyAction ( clock, nrst, en, start, address, wr_en, nexthop,
   assign data_out[2] = 1'b0;
   assign data_out[1] = 1'b0;
 
-  DFFSSRX1 \state_reg[2]  ( .D(state[1]), .RSTB(state[0]), .SETB(n1), .CLK(
-        clock), .Q(state[2]), .QN(n10) );
-  DFFSSRX1 \state_reg[1]  ( .D(n8), .RSTB(nrst), .SETB(n3), .CLK(clock), .Q(
+  DFFSSRX1 \state_reg[1]  ( .D(nrst), .RSTB(n33), .SETB(n5), .CLK(clock), .Q(
         state[1]), .QN(n11) );
-  AO21X1 U47 ( .IN1(data_out[0]), .IN2(n5), .IN3(n17), .Q(n47) );
-  AO22X1 U48 ( .IN1(n18), .IN2(forAggregation), .IN3(n19), .IN4(n20), .Q(n48)
+  AO22X1 U47 ( .IN1(done), .IN2(n17), .IN3(nrst), .IN4(n1), .Q(n49) );
+  AO21X1 U48 ( .IN1(data_out[0]), .IN2(n3), .IN3(n19), .Q(n50) );
+  AO22X1 U49 ( .IN1(n20), .IN2(forAggregation), .IN3(n21), .IN4(n22), .Q(n51)
          );
-  AO21X1 U49 ( .IN1(address[1]), .IN2(n5), .IN3(n17), .Q(n49) );
-  AND2X1 U50 ( .IN1(n19), .IN2(N92), .Q(n17) );
-  AO22X1 U51 ( .IN1(done), .IN2(n21), .IN3(n2), .IN4(nrst), .Q(n50) );
-  AO22X1 U52 ( .IN1(wr_en), .IN2(n4), .IN3(n19), .IN4(n23), .Q(n51) );
-  NAND3X0 U53 ( .IN1(state[0]), .IN2(n10), .IN3(state[1]), .QN(n24) );
-  AO222X1 U54 ( .IN1(nextsinks[15]), .IN2(n25), .IN3(nexthop[15]), .IN4(n19), 
-        .IN5(action[15]), .IN6(n26), .Q(n52) );
-  AO222X1 U55 ( .IN1(nextsinks[14]), .IN2(n25), .IN3(nexthop[14]), .IN4(n19), 
-        .IN5(action[14]), .IN6(n26), .Q(n53) );
-  AO222X1 U56 ( .IN1(nextsinks[13]), .IN2(n25), .IN3(nexthop[13]), .IN4(n19), 
-        .IN5(action[13]), .IN6(n26), .Q(n54) );
-  AO222X1 U57 ( .IN1(nextsinks[12]), .IN2(n25), .IN3(nexthop[12]), .IN4(n19), 
-        .IN5(action[12]), .IN6(n26), .Q(n55) );
-  AO222X1 U58 ( .IN1(nextsinks[11]), .IN2(n25), .IN3(nexthop[11]), .IN4(n19), 
-        .IN5(action[11]), .IN6(n26), .Q(n56) );
-  AO222X1 U59 ( .IN1(nextsinks[10]), .IN2(n25), .IN3(nexthop[10]), .IN4(n19), 
-        .IN5(action[10]), .IN6(n26), .Q(n57) );
-  AO222X1 U60 ( .IN1(nextsinks[9]), .IN2(n25), .IN3(nexthop[9]), .IN4(n19), 
-        .IN5(action[9]), .IN6(n26), .Q(n58) );
-  AO222X1 U61 ( .IN1(nextsinks[8]), .IN2(n25), .IN3(nexthop[8]), .IN4(n19), 
-        .IN5(action[8]), .IN6(n26), .Q(n59) );
-  AO222X1 U62 ( .IN1(nextsinks[7]), .IN2(n25), .IN3(nexthop[7]), .IN4(n19), 
-        .IN5(action[7]), .IN6(n26), .Q(n60) );
-  AO22X1 U63 ( .IN1(action[6]), .IN2(n26), .IN3(n27), .IN4(n7), .Q(n61) );
-  AO221X1 U64 ( .IN1(n6), .IN2(nexthop[6]), .IN3(n8), .IN4(nextsinks[6]), 
+  AO21X1 U50 ( .IN1(address[1]), .IN2(n3), .IN3(n19), .Q(n52) );
+  AND2X1 U51 ( .IN1(n21), .IN2(N98), .Q(n19) );
+  AO22X1 U52 ( .IN1(wr_en), .IN2(n2), .IN3(n21), .IN4(n23), .Q(n53) );
+  AO222X1 U53 ( .IN1(nextsinks[15]), .IN2(n25), .IN3(nexthop[15]), .IN4(n21), 
+        .IN5(action[15]), .IN6(n26), .Q(n54) );
+  AO222X1 U54 ( .IN1(nextsinks[14]), .IN2(n25), .IN3(nexthop[14]), .IN4(n21), 
+        .IN5(action[14]), .IN6(n26), .Q(n55) );
+  AO222X1 U55 ( .IN1(nextsinks[13]), .IN2(n25), .IN3(nexthop[13]), .IN4(n21), 
+        .IN5(action[13]), .IN6(n26), .Q(n56) );
+  AO222X1 U56 ( .IN1(nextsinks[12]), .IN2(n25), .IN3(nexthop[12]), .IN4(n21), 
+        .IN5(action[12]), .IN6(n26), .Q(n57) );
+  AO222X1 U57 ( .IN1(nextsinks[11]), .IN2(n25), .IN3(nexthop[11]), .IN4(n21), 
+        .IN5(action[11]), .IN6(n26), .Q(n58) );
+  AO222X1 U58 ( .IN1(nextsinks[10]), .IN2(n25), .IN3(nexthop[10]), .IN4(n21), 
+        .IN5(action[10]), .IN6(n26), .Q(n59) );
+  AO222X1 U59 ( .IN1(nextsinks[9]), .IN2(n25), .IN3(nexthop[9]), .IN4(n21), 
+        .IN5(action[9]), .IN6(n26), .Q(n60) );
+  AO222X1 U60 ( .IN1(nextsinks[8]), .IN2(n25), .IN3(nexthop[8]), .IN4(n21), 
+        .IN5(action[8]), .IN6(n26), .Q(n61) );
+  AO222X1 U61 ( .IN1(nextsinks[7]), .IN2(n25), .IN3(nexthop[7]), .IN4(n21), 
+        .IN5(action[7]), .IN6(n26), .Q(n62) );
+  AO22X1 U62 ( .IN1(action[6]), .IN2(n26), .IN3(n27), .IN4(n6), .Q(n63) );
+  AO221X1 U63 ( .IN1(n4), .IN2(nexthop[6]), .IN3(n8), .IN4(nextsinks[6]), 
         .IN5(n28), .Q(n27) );
-  AO222X1 U65 ( .IN1(nextsinks[5]), .IN2(n25), .IN3(nexthop[5]), .IN4(n19), 
-        .IN5(action[5]), .IN6(n26), .Q(n62) );
-  AO222X1 U66 ( .IN1(nextsinks[4]), .IN2(n25), .IN3(nexthop[4]), .IN4(n19), 
-        .IN5(action[4]), .IN6(n26), .Q(n63) );
-  AO222X1 U67 ( .IN1(nextsinks[3]), .IN2(n25), .IN3(nexthop[3]), .IN4(n19), 
-        .IN5(action[3]), .IN6(n26), .Q(n64) );
-  AO222X1 U68 ( .IN1(nextsinks[2]), .IN2(n25), .IN3(nexthop[2]), .IN4(n19), 
-        .IN5(action[2]), .IN6(n26), .Q(n65) );
-  AO222X1 U69 ( .IN1(nextsinks[1]), .IN2(n25), .IN3(nexthop[1]), .IN4(n19), 
-        .IN5(action[1]), .IN6(n26), .Q(n66) );
-  AO22X1 U71 ( .IN1(action[0]), .IN2(n26), .IN3(n29), .IN4(n7), .Q(n67) );
-  AO221X1 U72 ( .IN1(n6), .IN2(nexthop[0]), .IN3(n8), .IN4(nextsinks[0]), 
+  AO222X1 U64 ( .IN1(nextsinks[5]), .IN2(n25), .IN3(nexthop[5]), .IN4(n21), 
+        .IN5(action[5]), .IN6(n26), .Q(n64) );
+  AO222X1 U65 ( .IN1(nextsinks[4]), .IN2(n25), .IN3(nexthop[4]), .IN4(n21), 
+        .IN5(action[4]), .IN6(n26), .Q(n65) );
+  AO222X1 U66 ( .IN1(nextsinks[3]), .IN2(n25), .IN3(nexthop[3]), .IN4(n21), 
+        .IN5(action[3]), .IN6(n26), .Q(n66) );
+  AO222X1 U67 ( .IN1(nextsinks[2]), .IN2(n25), .IN3(nexthop[2]), .IN4(n21), 
+        .IN5(action[2]), .IN6(n26), .Q(n67) );
+  AO222X1 U68 ( .IN1(nextsinks[1]), .IN2(n25), .IN3(nexthop[1]), .IN4(n21), 
+        .IN5(action[1]), .IN6(n26), .Q(n68) );
+  AO22X1 U71 ( .IN1(action[0]), .IN2(n26), .IN3(n29), .IN4(n6), .Q(n69) );
+  AO221X1 U72 ( .IN1(n4), .IN2(nexthop[0]), .IN3(n8), .IN4(nextsinks[0]), 
         .IN5(n28), .Q(n29) );
-  AO21X1 U74 ( .IN1(n20), .IN2(n6), .IN3(n9), .Q(N92) );
-  NOR4X0 U75 ( .IN1(n34), .IN2(n35), .IN3(n36), .IN4(n37), .QN(n20) );
-  OR4X1 U76 ( .IN1(nexthop[15]), .IN2(nexthop[1]), .IN3(nexthop[2]), .IN4(
-        nexthop[3]), .Q(n37) );
-  OR4X1 U77 ( .IN1(nexthop[4]), .IN2(nexthop[5]), .IN3(n38), .IN4(nexthop[7]), 
-        .Q(n36) );
-  OR2X1 U78 ( .IN1(nexthop[9]), .IN2(nexthop[8]), .Q(n38) );
-  NAND4X0 U79 ( .IN1(nexthop[6]), .IN2(nexthop[0]), .IN3(n33), .IN4(n13), .QN(
-        n35) );
-  NOR4X0 U80 ( .IN1(n39), .IN2(n40), .IN3(n41), .IN4(n42), .QN(n33) );
-  OR4X1 U81 ( .IN1(nextsinks[1]), .IN2(nextsinks[2]), .IN3(nextsinks[3]), 
-        .IN4(nextsinks[4]), .Q(n42) );
-  OR4X1 U82 ( .IN1(nextsinks[5]), .IN2(nextsinks[7]), .IN3(nextsinks[8]), 
-        .IN4(nextsinks[9]), .Q(n41) );
-  NAND4X0 U83 ( .IN1(nextsinks[6]), .IN2(nextsinks[0]), .IN3(n14), .IN4(n15), 
-        .QN(n40) );
-  OR4X1 U84 ( .IN1(nextsinks[12]), .IN2(nextsinks[13]), .IN3(nextsinks[14]), 
-        .IN4(nextsinks[15]), .Q(n39) );
-  OR4X1 U85 ( .IN1(nexthop[11]), .IN2(nexthop[12]), .IN3(nexthop[13]), .IN4(
-        nexthop[14]), .Q(n34) );
-  NAND3X0 U87 ( .IN1(n11), .IN2(n10), .IN3(state[0]), .QN(n32) );
-  NAND3X0 U88 ( .IN1(n44), .IN2(n31), .IN3(n1), .QN(N72) );
-  NAND3X0 U90 ( .IN1(n12), .IN2(n11), .IN3(state[2]), .QN(n22) );
-  OR2X1 U91 ( .IN1(n30), .IN2(en), .Q(n46) );
-  NAND3X0 U92 ( .IN1(state[0]), .IN2(n11), .IN3(state[2]), .QN(n30) );
-  NAND3X0 U93 ( .IN1(n12), .IN2(n10), .IN3(state[1]), .QN(n31) );
-  DFFX1 done_buf_reg ( .D(n50), .CLK(clock), .Q(done) );
-  DFFX1 forAggregation_buf_reg ( .D(n48), .CLK(clock), .Q(forAggregation) );
-  DFFX1 \action_buf_reg[15]  ( .D(n52), .CLK(clock), .Q(action[15]) );
-  DFFX1 \action_buf_reg[14]  ( .D(n53), .CLK(clock), .Q(action[14]) );
-  DFFX1 \action_buf_reg[13]  ( .D(n54), .CLK(clock), .Q(action[13]) );
-  DFFX1 \action_buf_reg[12]  ( .D(n55), .CLK(clock), .Q(action[12]) );
-  DFFX1 \action_buf_reg[11]  ( .D(n56), .CLK(clock), .Q(action[11]) );
-  DFFX1 \action_buf_reg[10]  ( .D(n57), .CLK(clock), .Q(action[10]) );
-  DFFX1 \action_buf_reg[9]  ( .D(n58), .CLK(clock), .Q(action[9]) );
-  DFFX1 \action_buf_reg[8]  ( .D(n59), .CLK(clock), .Q(action[8]) );
-  DFFX1 \action_buf_reg[7]  ( .D(n60), .CLK(clock), .Q(action[7]) );
-  DFFX1 \action_buf_reg[5]  ( .D(n62), .CLK(clock), .Q(action[5]) );
-  DFFX1 \action_buf_reg[4]  ( .D(n63), .CLK(clock), .Q(action[4]) );
-  DFFX1 \action_buf_reg[3]  ( .D(n64), .CLK(clock), .Q(action[3]) );
-  DFFX1 \action_buf_reg[2]  ( .D(n65), .CLK(clock), .Q(action[2]) );
-  DFFX1 \action_buf_reg[1]  ( .D(n66), .CLK(clock), .Q(action[1]) );
-  DFFX1 \data_out_buf_reg[0]  ( .D(n47), .CLK(clock), .Q(data_out[0]) );
-  DFFX1 \address_count_reg[1]  ( .D(n49), .CLK(clock), .Q(address[1]) );
-  DFFX1 \action_buf_reg[6]  ( .D(n61), .CLK(clock), .Q(action[6]) );
-  DFFX1 \action_buf_reg[0]  ( .D(n67), .CLK(clock), .Q(action[0]) );
-  DFFX1 wr_en_buf_reg ( .D(n51), .CLK(clock), .Q(wr_en) );
-  DFFX1 \state_reg[0]  ( .D(N72), .CLK(clock), .Q(state[0]), .QN(n12) );
-  NAND2X1 U28 ( .IN1(state[1]), .IN2(state[2]), .QN(n45) );
-  INVX0 U29 ( .INP(n19), .ZN(n3) );
-  AND2X1 U30 ( .IN1(n6), .IN2(nrst), .Q(n19) );
-  AND2X1 U31 ( .IN1(n8), .IN2(nrst), .Q(n25) );
-  INVX0 U32 ( .INP(N92), .ZN(n5) );
-  INVX0 U33 ( .INP(n26), .ZN(n7) );
-  OA221X1 U34 ( .IN1(n31), .IN2(n20), .IN3(n32), .IN4(n33), .IN5(n21), .Q(n26)
+  NAND3X0 U74 ( .IN1(n5), .IN2(n24), .IN3(n35), .QN(n70) );
+  NAND4X0 U75 ( .IN1(n35), .IN2(n36), .IN3(n37), .IN4(n31), .QN(n71) );
+  NAND3X0 U76 ( .IN1(n12), .IN2(n11), .IN3(start), .QN(n37) );
+  NOR4X0 U77 ( .IN1(n33), .IN2(n28), .IN3(n11), .IN4(n7), .QN(n34) );
+  NAND3X0 U78 ( .IN1(state[0]), .IN2(n10), .IN3(state[1]), .QN(n24) );
+  NAND3X0 U79 ( .IN1(n11), .IN2(n10), .IN3(state[0]), .QN(n30) );
+  AND3X1 U80 ( .IN1(n39), .IN2(n18), .IN3(nrst), .Q(n35) );
+  NAND3X0 U81 ( .IN1(n12), .IN2(n11), .IN3(state[2]), .QN(n18) );
+  OR2X1 U82 ( .IN1(n38), .IN2(en), .Q(n39) );
+  AO21X1 U83 ( .IN1(n22), .IN2(n4), .IN3(n9), .Q(N98) );
+  NAND3X0 U84 ( .IN1(state[2]), .IN2(n11), .IN3(state[0]), .QN(n38) );
+  NAND3X0 U85 ( .IN1(n12), .IN2(n10), .IN3(state[1]), .QN(n31) );
+  NOR4X0 U86 ( .IN1(n40), .IN2(n41), .IN3(n42), .IN4(n43), .QN(n22) );
+  OR4X1 U87 ( .IN1(nexthop[15]), .IN2(nexthop[1]), .IN3(nexthop[2]), .IN4(
+        nexthop[3]), .Q(n43) );
+  OR4X1 U88 ( .IN1(nexthop[4]), .IN2(nexthop[5]), .IN3(n44), .IN4(nexthop[7]), 
+        .Q(n42) );
+  OR2X1 U89 ( .IN1(nexthop[9]), .IN2(nexthop[8]), .Q(n44) );
+  NAND4X0 U90 ( .IN1(nexthop[6]), .IN2(nexthop[0]), .IN3(n32), .IN4(n13), .QN(
+        n41) );
+  NOR4X0 U91 ( .IN1(n45), .IN2(n46), .IN3(n47), .IN4(n48), .QN(n32) );
+  OR4X1 U92 ( .IN1(nextsinks[1]), .IN2(nextsinks[2]), .IN3(nextsinks[3]), 
+        .IN4(nextsinks[4]), .Q(n48) );
+  OR4X1 U93 ( .IN1(nextsinks[5]), .IN2(nextsinks[7]), .IN3(nextsinks[8]), 
+        .IN4(nextsinks[9]), .Q(n47) );
+  NAND4X0 U94 ( .IN1(nextsinks[6]), .IN2(nextsinks[0]), .IN3(n14), .IN4(n15), 
+        .QN(n46) );
+  OR4X1 U95 ( .IN1(nextsinks[12]), .IN2(nextsinks[13]), .IN3(nextsinks[14]), 
+        .IN4(nextsinks[15]), .Q(n45) );
+  OR4X1 U96 ( .IN1(nexthop[11]), .IN2(nexthop[12]), .IN3(nexthop[13]), .IN4(
+        nexthop[14]), .Q(n40) );
+  DFFX1 done_buf_reg ( .D(n49), .CLK(clock), .Q(done) );
+  DFFX1 forAggregation_buf_reg ( .D(n51), .CLK(clock), .Q(forAggregation) );
+  DFFX1 \action_buf_reg[15]  ( .D(n54), .CLK(clock), .Q(action[15]) );
+  DFFX1 \action_buf_reg[14]  ( .D(n55), .CLK(clock), .Q(action[14]) );
+  DFFX1 \action_buf_reg[13]  ( .D(n56), .CLK(clock), .Q(action[13]) );
+  DFFX1 \action_buf_reg[12]  ( .D(n57), .CLK(clock), .Q(action[12]) );
+  DFFX1 \action_buf_reg[11]  ( .D(n58), .CLK(clock), .Q(action[11]) );
+  DFFX1 \action_buf_reg[10]  ( .D(n59), .CLK(clock), .Q(action[10]) );
+  DFFX1 \action_buf_reg[9]  ( .D(n60), .CLK(clock), .Q(action[9]) );
+  DFFX1 \action_buf_reg[8]  ( .D(n61), .CLK(clock), .Q(action[8]) );
+  DFFX1 \action_buf_reg[7]  ( .D(n62), .CLK(clock), .Q(action[7]) );
+  DFFX1 \action_buf_reg[5]  ( .D(n64), .CLK(clock), .Q(action[5]) );
+  DFFX1 \action_buf_reg[4]  ( .D(n65), .CLK(clock), .Q(action[4]) );
+  DFFX1 \action_buf_reg[3]  ( .D(n66), .CLK(clock), .Q(action[3]) );
+  DFFX1 \action_buf_reg[2]  ( .D(n67), .CLK(clock), .Q(action[2]) );
+  DFFX1 \action_buf_reg[1]  ( .D(n68), .CLK(clock), .Q(action[1]) );
+  DFFX1 \data_out_buf_reg[0]  ( .D(n50), .CLK(clock), .Q(data_out[0]) );
+  DFFX1 \address_count_reg[1]  ( .D(n52), .CLK(clock), .Q(address[1]) );
+  DFFX1 \action_buf_reg[6]  ( .D(n63), .CLK(clock), .Q(action[6]) );
+  DFFX1 \action_buf_reg[0]  ( .D(n69), .CLK(clock), .Q(action[0]) );
+  DFFX1 wr_en_buf_reg ( .D(n53), .CLK(clock), .Q(wr_en) );
+  DFFX1 \state_reg[2]  ( .D(n70), .CLK(clock), .Q(state[2]), .QN(n10) );
+  DFFX1 \state_reg[0]  ( .D(n71), .CLK(clock), .Q(state[0]), .QN(n12) );
+  AND2X1 U28 ( .IN1(n4), .IN2(nrst), .Q(n21) );
+  AND2X1 U29 ( .IN1(n8), .IN2(nrst), .Q(n25) );
+  INVX0 U30 ( .INP(N98), .ZN(n3) );
+  INVX0 U31 ( .INP(n26), .ZN(n6) );
+  OA221X1 U32 ( .IN1(n31), .IN2(n22), .IN3(n30), .IN4(n32), .IN5(n17), .Q(n26)
          );
-  NAND2X1 U35 ( .IN1(nrst), .IN2(n30), .QN(n28) );
-  INVX0 U36 ( .INP(n21), .ZN(n9) );
-  INVX0 U37 ( .INP(n31), .ZN(n6) );
-  INVX0 U38 ( .INP(n32), .ZN(n8) );
-  NAND2X1 U39 ( .IN1(start), .IN2(n12), .QN(n44) );
-  INVX0 U40 ( .INP(n22), .ZN(n2) );
-  OA21X1 U41 ( .IN1(n16), .IN2(n30), .IN3(nrst), .Q(n21) );
-  INVX0 U42 ( .INP(en), .ZN(n16) );
-  NOR2X0 U43 ( .IN1(n6), .IN2(n9), .QN(n18) );
-  AND4X1 U44 ( .IN1(nrst), .IN2(n45), .IN3(n46), .IN4(n22), .Q(n1) );
-  INVX0 U45 ( .INP(n23), .ZN(n4) );
-  NAND2X1 U46 ( .IN1(n24), .IN2(n5), .QN(n23) );
-  INVX0 U70 ( .INP(nexthop[10]), .ZN(n13) );
-  INVX0 U73 ( .INP(nextsinks[11]), .ZN(n15) );
-  INVX0 U86 ( .INP(nextsinks[10]), .ZN(n14) );
+  INVX0 U33 ( .INP(n34), .ZN(n5) );
+  NAND2X1 U34 ( .IN1(nrst), .IN2(n38), .QN(n28) );
+  INVX0 U35 ( .INP(n17), .ZN(n9) );
+  INVX0 U36 ( .INP(n31), .ZN(n4) );
+  NAND2X1 U37 ( .IN1(n30), .IN2(n31), .QN(n33) );
+  INVX0 U38 ( .INP(n30), .ZN(n8) );
+  INVX0 U39 ( .INP(n24), .ZN(n7) );
+  NAND2X1 U40 ( .IN1(n34), .IN2(state[0]), .QN(n36) );
+  INVX0 U41 ( .INP(n23), .ZN(n2) );
+  NAND2X1 U42 ( .IN1(n24), .IN2(n3), .QN(n23) );
+  INVX0 U43 ( .INP(n18), .ZN(n1) );
+  OA21X1 U44 ( .IN1(n16), .IN2(n38), .IN3(nrst), .Q(n17) );
+  INVX0 U45 ( .INP(en), .ZN(n16) );
+  NOR2X0 U46 ( .IN1(n4), .IN2(n9), .QN(n20) );
+  INVX0 U69 ( .INP(nexthop[10]), .ZN(n13) );
+  INVX0 U70 ( .INP(nextsinks[11]), .ZN(n15) );
+  INVX0 U73 ( .INP(nextsinks[10]), .ZN(n14) );
 endmodule
 
 
@@ -11082,25 +11086,23 @@ module top ( clock, nrst, en, address, wr_en, mem_data_in, mem_data_out,
   LATCHX1 \wr_select_reg[2]  ( .CLK(N35), .D(N38), .Q(wr_select[2]) );
   LATCHX1 \wr_select_reg[1]  ( .CLK(N35), .D(N37), .Q(wr_select[1]) );
   LATCHX1 \wr_select_reg[0]  ( .CLK(N35), .D(N36), .Q(wr_select[0]) );
-  AO21X1 U121 ( .IN1(MY_BATTERY_STAT[15]), .IN2(n41), .IN3(n54), .Q(n32) );
-  AO21X1 U122 ( .IN1(MY_BATTERY_STAT[14]), .IN2(n41), .IN3(n17), .Q(n33) );
-  AO21X1 U123 ( .IN1(MY_BATTERY_STAT[12]), .IN2(n41), .IN3(n17), .Q(n34) );
-  AO21X1 U124 ( .IN1(MY_BATTERY_STAT[11]), .IN2(n41), .IN3(n17), .Q(n35) );
-  AO21X1 U125 ( .IN1(MY_BATTERY_STAT[8]), .IN2(n41), .IN3(n17), .Q(n36) );
-  AO21X1 U126 ( .IN1(MY_BATTERY_STAT[7]), .IN2(n41), .IN3(n17), .Q(n37) );
-  AO21X1 U127 ( .IN1(MY_BATTERY_STAT[4]), .IN2(n41), .IN3(n17), .Q(n38) );
-  AO21X1 U128 ( .IN1(MY_BATTERY_STAT[3]), .IN2(n41), .IN3(n17), .Q(n39) );
-  AO21X1 U129 ( .IN1(MY_BATTERY_STAT[0]), .IN2(n41), .IN3(n17), .Q(n40) );
-  AO22X1 U138 ( .IN1(addr_7_1[1]), .IN2(done_selectMyAction), .IN3(
+  AO21X1 U122 ( .IN1(MY_BATTERY_STAT[15]), .IN2(n41), .IN3(n54), .Q(n32) );
+  AO21X1 U123 ( .IN1(MY_BATTERY_STAT[14]), .IN2(n41), .IN3(n17), .Q(n33) );
+  AO21X1 U124 ( .IN1(MY_BATTERY_STAT[12]), .IN2(n41), .IN3(n17), .Q(n34) );
+  AO21X1 U125 ( .IN1(MY_BATTERY_STAT[11]), .IN2(n41), .IN3(n17), .Q(n35) );
+  AO21X1 U126 ( .IN1(MY_BATTERY_STAT[8]), .IN2(n41), .IN3(n17), .Q(n36) );
+  AO21X1 U127 ( .IN1(MY_BATTERY_STAT[7]), .IN2(n41), .IN3(n17), .Q(n37) );
+  AO21X1 U128 ( .IN1(MY_BATTERY_STAT[4]), .IN2(n41), .IN3(n17), .Q(n38) );
+  AO21X1 U129 ( .IN1(MY_BATTERY_STAT[3]), .IN2(n41), .IN3(n17), .Q(n39) );
+  AO21X1 U130 ( .IN1(MY_BATTERY_STAT[0]), .IN2(n41), .IN3(n17), .Q(n40) );
+  AO22X1 U139 ( .IN1(addr_7_1[1]), .IN2(done_selectMyAction), .IN3(
         \addr_7_0[1] ), .IN4(n58), .Q(\addr_7_buf[1] ) );
-  NAND3X0 U141 ( .IN1(n18), .IN2(n55), .IN3(n19), .QN(N36) );
-  NAND3X0 U142 ( .IN1(n20), .IN2(n55), .IN3(n21), .QN(N34) );
-  NAND3X0 U143 ( .IN1(n20), .IN2(n56), .IN3(done_findMyBest), .QN(N32) );
-  NAND3X0 U144 ( .IN1(n23), .IN2(n57), .IN3(n63), .QN(N35) );
-  NAND3X0 U145 ( .IN1(n24), .IN2(n19), .IN3(n25), .QN(N37) );
-  NAND4X0 U146 ( .IN1(n28), .IN2(done_betterNeighborsInMyCluster), .IN3(n59), 
-        .IN4(n58), .QN(n24) );
-  AND2X1 U147 ( .IN1(done_findMyBest), .IN2(n22), .Q(n28) );
+  NAND3X0 U142 ( .IN1(n18), .IN2(n55), .IN3(n19), .QN(N36) );
+  NAND3X0 U143 ( .IN1(n20), .IN2(n55), .IN3(n21), .QN(N34) );
+  NAND3X0 U144 ( .IN1(n20), .IN2(n56), .IN3(done_findMyBest), .QN(N32) );
+  NAND3X0 U145 ( .IN1(n23), .IN2(n57), .IN3(n63), .QN(N35) );
+  NAND3X0 U146 ( .IN1(n24), .IN2(n19), .IN3(n25), .QN(N37) );
+  OR4X1 U147 ( .IN1(n59), .IN2(n28), .IN3(done_reward), .IN4(n29), .Q(n24) );
   NOR3X0 U148 ( .IN1(n62), .IN2(n26), .IN3(n27), .QN(n22) );
   mux_11bit addr_mux ( .select(addr_select), .out(address), .in0(addr_0), 
         .in1({1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, addr_1[1], 
@@ -11228,34 +11230,35 @@ module top ( clock, nrst, en, address, wr_en, mem_data_in, mem_data_out,
   NOR2X0 U158 ( .IN1(n54), .IN2(n41), .QN(n17) );
   NAND2X1 U159 ( .IN1(n63), .IN2(n62), .QN(n25) );
   INVX0 U160 ( .INP(n27), .ZN(n63) );
-  NAND2X1 U161 ( .IN1(n29), .IN2(n28), .QN(n20) );
-  NAND2X1 U162 ( .IN1(n23), .IN2(n24), .QN(N38) );
-  NAND2X1 U163 ( .IN1(n28), .IN2(n60), .QN(n23) );
-  NAND2X1 U164 ( .IN1(n26), .IN2(n63), .QN(n19) );
-  INVX0 U165 ( .INP(done_selectMyAction), .ZN(n58) );
+  INVX0 U161 ( .INP(n28), .ZN(n61) );
+  NAND2X1 U162 ( .IN1(n29), .IN2(n61), .QN(n20) );
+  NAND2X1 U163 ( .IN1(n61), .IN2(n59), .QN(n23) );
+  NAND2X1 U164 ( .IN1(n23), .IN2(n24), .QN(N38) );
+  NAND2X1 U165 ( .IN1(n26), .IN2(n63), .QN(n19) );
   AND2X1 U166 ( .IN1(addr_7_1[0]), .IN2(done_selectMyAction), .Q(n43) );
-  AND2X1 U167 ( .IN1(addr_7_1[2]), .IN2(done_selectMyAction), .Q(n44) );
-  AND2X1 U168 ( .IN1(addr_7_1[3]), .IN2(done_selectMyAction), .Q(n45) );
-  AND2X1 U169 ( .IN1(addr_7_1[4]), .IN2(done_selectMyAction), .Q(n46) );
-  AND2X1 U170 ( .IN1(addr_7_1[5]), .IN2(done_selectMyAction), .Q(n47) );
-  AND2X1 U171 ( .IN1(addr_7_1[6]), .IN2(done_selectMyAction), .Q(n48) );
-  AND2X1 U172 ( .IN1(addr_7_1[7]), .IN2(done_selectMyAction), .Q(n49) );
-  AND2X1 U173 ( .IN1(addr_7_1[8]), .IN2(done_selectMyAction), .Q(n50) );
-  AND2X1 U174 ( .IN1(addr_7_1[10]), .IN2(done_selectMyAction), .Q(n51) );
-  NAND2X1 U175 ( .IN1(en), .IN2(n66), .QN(n31) );
-  AND2X1 U176 ( .IN1(done_selectMyAction), .IN2(addr_7_1[9]), .Q(n52) );
-  OAI22X1 U177 ( .IN1(done_selectMyAction), .IN2(n66), .IN3(\state[0] ), .IN4(
+  INVX0 U167 ( .INP(done_selectMyAction), .ZN(n58) );
+  AND2X1 U168 ( .IN1(addr_7_1[2]), .IN2(done_selectMyAction), .Q(n44) );
+  AND2X1 U169 ( .IN1(addr_7_1[3]), .IN2(done_selectMyAction), .Q(n45) );
+  AND2X1 U170 ( .IN1(addr_7_1[4]), .IN2(done_selectMyAction), .Q(n46) );
+  AND2X1 U171 ( .IN1(addr_7_1[5]), .IN2(done_selectMyAction), .Q(n47) );
+  AND2X1 U172 ( .IN1(addr_7_1[6]), .IN2(done_selectMyAction), .Q(n48) );
+  AND2X1 U173 ( .IN1(addr_7_1[7]), .IN2(done_selectMyAction), .Q(n49) );
+  AND2X1 U174 ( .IN1(addr_7_1[8]), .IN2(done_selectMyAction), .Q(n50) );
+  AND2X1 U175 ( .IN1(addr_7_1[10]), .IN2(done_selectMyAction), .Q(n51) );
+  NAND2X1 U176 ( .IN1(en), .IN2(n66), .QN(n31) );
+  AND2X1 U177 ( .IN1(done_selectMyAction), .IN2(addr_7_1[9]), .Q(n52) );
+  OAI22X1 U178 ( .IN1(done_selectMyAction), .IN2(n66), .IN3(\state[0] ), .IN4(
         n65), .QN(n53) );
-  INVX0 U178 ( .INP(n29), .ZN(n59) );
   INVX0 U179 ( .INP(N35), .ZN(n56) );
   INVX0 U180 ( .INP(done_fixSinkList), .ZN(n62) );
-  NOR2X0 U181 ( .IN1(done_winnerPolicy), .IN2(n60), .QN(n29) );
-  NOR2X0 U182 ( .IN1(done_neighborSinkInOtherCluster), .IN2(n62), .QN(n26) );
-  INVX0 U183 ( .INP(done_betterNeighborsInMyCluster), .ZN(n60) );
-  NAND2X1 U184 ( .IN1(n22), .IN2(n61), .QN(n21) );
-  INVX0 U185 ( .INP(done_findMyBest), .ZN(n61) );
-  NAND2X1 U186 ( .IN1(n64), .IN2(done_learnCosts), .QN(n18) );
-  INVX0 U187 ( .INP(done_iamDestination), .ZN(n64) );
-  NAND2X1 U188 ( .IN1(done_learnCosts), .IN2(n18), .QN(n27) );
+  INVX0 U181 ( .INP(done_betterNeighborsInMyCluster), .ZN(n59) );
+  NAND2X1 U182 ( .IN1(done_findMyBest), .IN2(n22), .QN(n28) );
+  NOR2X0 U183 ( .IN1(done_neighborSinkInOtherCluster), .IN2(n62), .QN(n26) );
+  NAND2X1 U184 ( .IN1(n22), .IN2(n60), .QN(n21) );
+  INVX0 U185 ( .INP(done_findMyBest), .ZN(n60) );
+  NOR2X0 U186 ( .IN1(done_winnerPolicy), .IN2(n59), .QN(n29) );
+  NAND2X1 U187 ( .IN1(n64), .IN2(done_learnCosts), .QN(n18) );
+  INVX0 U188 ( .INP(done_iamDestination), .ZN(n64) );
+  NAND2X1 U189 ( .IN1(done_learnCosts), .IN2(n18), .QN(n27) );
 endmodule
 
