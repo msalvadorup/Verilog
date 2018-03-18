@@ -55,8 +55,10 @@ module mem(clock, address, wr_en, data_in, data_out);
 		memory['h2] = 0;
 		memory['h3] = 0;
 
+/*
 		memory['h4] = 0;
 		memory['h5] = 0;
+*/
 
 		memory['h6] = 0;
 		memory['h7] = 0;
