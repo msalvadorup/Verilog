@@ -62,3 +62,7 @@ r:
 	vcs ../rtl/mem.v ../mapped/mapped_reward.v ../lib/saed90nm.v tb_reward.v -full64 -debug_pp +neg_tchk -R -l mapped_reward.log
 	./simv
 
+top:
+	vcs ../rtl/memory.v ../mapped/top_mapped.v ../lib/saed90nm.v tb_top.v -full64 -debug_pp +neg_tchk -R -l top_mapped.log
+	./simv
+
