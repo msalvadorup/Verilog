@@ -32,9 +32,9 @@ module tb_top();
 	initial begin
 		// new neighbor
 		fsourceID = 15;
-		fbatteryStat = 16'b0100000000000000; // 0.5
-		fValue = 16'b0000011010000000; // idk
-		fclusterID = 2;
+		fbatteryStat = 16'h5999;//16'b0100000000000000; // 0.5
+		fValue = 16'b0000011010000000; // 16'h4C4; 
+		fclusterID = 1;//2;
 		fdestinationID = 3;
 /*
 		// existing neighbor
