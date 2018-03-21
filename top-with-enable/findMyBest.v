@@ -27,6 +27,9 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 			l = 0; // neighborCount index
 			kTemp = 32'd0;
 			mybestTemp = 32'd0;
+			HCM = 0;
+			neighborCount = 0;
+			qValue = 0;
 		end
 		else begin
 			case (state)
@@ -105,6 +108,9 @@ module findMyBest(clock, nrst, en, start, address, data_in, MY_BATTERY_STAT, myb
 						state <= 0;
 						k = 0;	// HCM index
 						l = 0; // neighborCount index
+						HCM = 0;
+						neighborCount = 0;
+						qValue = 0;
 					end
 					else state <= 8;
 				end

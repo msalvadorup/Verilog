@@ -1,3 +1,9 @@
+ais:
+	dc_shell -f amISink.tcl -output_log_file amISink.log
+
+aid:
+	dc_shell -f amIDestination.tcl -output_log_file amIDestination.log
+
 fsl:
 	dc_shell -f fixSinkList.tcl -output_log_file fixSinkList.log
 
@@ -37,5 +43,5 @@ lc:
 s:
 	dc_shell -f selectMyAction.tcl -output_log_file selectMyAction.log
 
-fsl:
-	dc_shell -f fixSinkList.tcl -output_log_file fixSinkList.log
+top:
+	dc_shell -f top.tcl -output_log_file top.log

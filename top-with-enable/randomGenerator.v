@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 /*
  *  Linear Feedback Shift Register
  *  Reference: https://www.xilinx.com/support/documentation/application_notes/xapp052.pdf

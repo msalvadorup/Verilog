@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module rngAddress(clock, nrst, start_rng_address, betterNeighborCount, which, rng_address, done_rng_address);
 	input clock, nrst, start_rng_address;
 	input [15:0] betterNeighborCount, which;

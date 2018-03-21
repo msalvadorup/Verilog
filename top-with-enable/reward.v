@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `define WORD_WIDTH 16
 
 //fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID
@@ -71,7 +72,7 @@ module reward(clock, nrst, en, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop
                     $display("fdestinationID: %d", data_out_buf);
                 end
                 4'd7: begin
-                    done_buf = 0;
+                    done_buf = 1;
                     state = 0;
                 end
                 default: begin
@@ -85,3 +86,4 @@ module reward(clock, nrst, en, start, MY_NODE_ID, MY_CLUSTER_ID, action, besthop
     assign done = done_buf;
     assign address = address_count;
 endmodule
+
