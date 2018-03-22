@@ -82,6 +82,7 @@ module selectMyAction(clock, nrst, en, start, address, wr_en, nexthop, nextsinks
 
 				3'd4: begin
 					done_buf = 1'd1;
+					//forAggregation_buf = 1'd0;
 					state = 3'd5;
 				end
 

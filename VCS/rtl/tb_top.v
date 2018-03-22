@@ -5,9 +5,9 @@
 //`include "memory.v"
 
 module tb_top();	
-	reg clock, nrst, en;
+	reg clock, nrst, en, isAggregated;
 	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID;
-	wire done_reward;
+	wire done;
 	wire [`WORD_WIDTH-1:0] reward_out, out_sourceID, out_clusterID, out_batteryStat, out_Value, out_destinationID;
 
 	// Memory Module Instantiation
@@ -18,7 +18,7 @@ module tb_top();
 
 	// Top Module Instantiation
 	top t1(clock, nrst, en, address, wr_en, mem_data_in, mem_data_out, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID,  isAggregated,
-		out_sourceID, out_clusterID, out_batteryStat, out_Value, out_destinationID, forAggregation, done_reward);
+		out_sourceID, out_clusterID, out_batteryStat, out_Value, out_destinationID, forAggregation, done);
 
 	// Clock
 	initial begin
@@ -44,6 +44,18 @@ module tb_top();
 		fValue = 16'b0000011010000000; // idk
 		fclusterID = 2;
 		fdestinationID = 3;
+		isAggregated = 0;
+		@(posedge done);
+		$display("DONE!!!");
+			#10 en = 1;
+			#20 en = ~en;
+
+		fsourceID = 15;
+		fbatteryStat = 16'b0100000000000000; // 0.5
+		fValue = 16'b0000011010000000; // idk
+		fclusterID = 2;
+		fdestinationID = 3;
+		isAggregated = 1;
 /*
 		// existing neighbor
 		fsourceID = 1;
