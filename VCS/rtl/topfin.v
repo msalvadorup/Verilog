@@ -225,7 +225,7 @@ module top(clock, nrst, en, address, wr_en, mem_data_in, mem_data_out, fsourceID
 	// 		endcase
 	// 	end
 	// end
-reg [4:0] state; 
+reg [3:0] state; 
 always @(posedge clock) begin
 	if (!nrst) begin
 			initial_epsilon = 7;
