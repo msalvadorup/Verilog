@@ -49,9 +49,10 @@
 `include "rngAddress.v"
 `include "selectMyAction.v"
 `include "rewardn.v"
-//`include "top.v"
+//`include "topfin.v"
+//`include "mem.v"
 
-module top(clock, nrst, en, address, wr_en, mem_data_in, mem_data_out, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID, isAggregated,
+module top(clock, nrst, en, address, wr_en, mem_data_in, mem_data_out, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID, isAggregated, MY_BATTERY_STAT,
 	out_sourceID, out_clusterID, out_batteryStat, out_Value, out_destinationID, forAggregation, done);
 
 	//I/O except memory
@@ -245,14 +246,14 @@ always @(posedge clock) begin
 			MY_NODE_ID <= 3;
 			forAggregation_buf <= 0;
 			done_buf <= 0;
-			state <= 0;
+			state <= 4'd0;
 		
 	end
 	else begin
 		case(state)
 			0: begin //IDLE
 				if(en) begin
-					state <= 1;
+					state <= 4'd1;
 					initial_epsilon = 7;
 					wren_4 <= 0;		
 					mdi_4 <= 0;
@@ -274,119 +275,150 @@ always @(posedge clock) begin
 				end
 				else state <= 0;
 			end
-			1: begin //Check isAggregated
+			4'd1: begin //Check isAggregated
 				if(isAggregated) begin
-					state <= 0;//100;
+					state <= 4'd0;//100;
 				end
 				else begin
 					start_learnCosts <= 1;
 					addr_select = 3'd0;
 					wr_select = 3'd0;
-					state <= 2;
+					state <= 4'd2;
 				end
 			end
-			2: begin //learnCosts
+			4'd2: begin //learnCosts
 				if(done_learnCosts) begin
+
 					start_amISink <= 1;
 					addr_select = 3'd1;
 					wr_select = 3'd1;
-					state <= 3;
+					state <= 4'd3;
 				end
-				else state <= 2;
+				else begin
+					state <= 4'd2;
+					start_learnCosts <= 0;
+				end
 			end
-			3: begin //amISink
+			4'd3: begin //amISink
 				if(done_iamSink) begin
 					if(forAggregation1) begin
 						forAggregation_buf <= 1;
 						done_buf <= 1;
-						state <= 0;//101; 
+						state <= 4'd0;//101; 
 					end
 					else begin
 						start_amIDestination <= 1;
-						state <= 4;
+						state <= 4'd4;
 					end
 				end
-				else state <= 3;
+				else begin 
+					state <= 4'd3;
+					start_amISink <= 0;
+				end
 			end
-			4: begin //amIDestination
+			4'd4: begin //amIDestination
 				if(done_iamDestination) begin
 					start_fixSinkList <= 1;
-					state <= 5;
+					state <= 4'd5;
 					addr_select = 3'd2;
 					wr_select = 3'd2;
 				end
-				else state <= 4;
+				else begin
+					state <= 4'd4;
+					start_amIDestination <= 0;
+				end
 			end
-			5: begin //fixSinkList
+			4'd5: begin //fixSinkList
 				if(done_fixSinkList) begin
 					start_neighborSinkInOtherCluster <= 1;
-					state <= 6;
+					state <= 4'd6;
 					addr_select = 3'd3;
 					wr_select = 3'd3;
 				end
-				else state <= 5;
+				else begin 
+					state <= 4'd5;
+					start_fixSinkList <= 0;
+				end
 			end
-			6: begin //neighborSinkInOtherCluster
+			4'd6: begin //neighborSinkInOtherCluster
 				if(done_neighborSinkInOtherCluster) begin
 					if(forAggregation2) begin
 						forAggregation_buf <= 1;
 						done_buf <= 1;
-						state <= 0;//101;
+						state <= 4'd0;//101;
 					end
 					else begin
 						start_findMyBest <= 1;
-						state <= 7;
+						state <= 4'd7;
 						addr_select = 3'd4;
 					end
 				end
-				else state <= 6;
+				else begin 
+					state <= 4'd6;
+					start_neighborSinkInOtherCluster <= 0;
+				end
 			end
-			7: begin //findMyBest
+			4'd7: begin //findMyBest
 				if(done_findMyBest) begin
 					start_betterNeighborsInMyCluster <= 1;
-					state <= 8;
+					state <= 4'd8;
 					addr_select = 3'd5;
 					wr_select = 3'd5;
 				end
-				else state <= 7;
+				else begin
+					start_findMyBest <= 0;
+					state <= 4'd7;
+				end
 			end
-			8: begin //betterNeighbors
+			4'd8: begin //betterNeighbors
 				if(done_betterNeighborsInMyCluster) begin
 					start_winnerPolicy <= 1;
-					state <= 9;
+					state <= 4'd9;
 					addr_select = 3'd6;
 				end
-				else state <= 8;
+				else begin 
+					state <= 4'd8;
+					start_betterNeighborsInMyCluster <= 0;
+				end
 			end
-			9: begin //winnerPolicy
+			4'd9: begin //winnerPolicy
 				if(done_winnerPolicy) begin
 					start_selectMyAction <= 1;
 					state <= 10;
 					addr_select = 3'd7;
 					wr_select = 3'd7;
 				end
-				else state <= 9;
+				else begin 
+					state <= 4'd9;
+					start_winnerPolicy <= 0;
+				end
 			end
-			10: begin //selectMyAction
-				if(done_winnerPolicy) begin
+			4'd10: begin //selectMyAction
+				if(done_selectMyAction) begin
 					if(forAggregation3) begin
 						forAggregation_buf <= 1;
 						done_buf <= 1;
-						state <= 0;//101;
+						state <= 4'd0;//101;
 					end
 					else begin
 						start_reward <= 1;
-						state <= 11;
+						state <= 4'd11;
 					end
 				end
-				else state <= 10;
+				else begin
+					state <= 4'd10;
+					start_selectMyAction <= 0;
+				end
 			end
-			11: begin //reward
+			4'd11: begin //reward
 				if(done_reward) begin
 					done_buf <= 1;
-					state <= 0;
+					state <= 4'd0;
 				end
-				else state <= 11;
+				else begin
+					state <= 4'd11;
+					start_reward <= 0;
+				end
 			end
 			// 100: begin //Aggregated Packet 
 				
