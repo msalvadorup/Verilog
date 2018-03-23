@@ -277,6 +277,7 @@ always @(posedge clock) begin
 			end
 			4'd1: begin //Check isAggregated
 				if(isAggregated) begin
+					done_buf <= 1;
 					state <= 4'd0;//100;
 				end
 				else begin
