@@ -6,7 +6,7 @@
 
 module tb_top();	
 	reg clock, nrst, en, isAggregated;
-	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID;
+	reg [`WORD_WIDTH-1:0] fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID, MY_BATTERY_STAT;
 	wire done;
 	wire [`WORD_WIDTH-1:0] reward_out, out_sourceID, out_clusterID, out_batteryStat, out_Value, out_destinationID;
 
@@ -17,7 +17,7 @@ module tb_top();
 	mem mem1(clock, address, wr_en, mem_data_in, mem_data_out);	
 
 	// Top Module Instantiation
-	top t1(clock, nrst, en, address, wr_en, mem_data_in, mem_data_out, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID,  isAggregated,
+	top t1(clock, nrst, en, address, wr_en, mem_data_in, mem_data_out, fsourceID, fbatteryStat, fValue, fclusterID, fdestinationID,  isAggregated, MY_BATTERY_STAT,
 		out_sourceID, out_clusterID, out_batteryStat, out_Value, out_destinationID, forAggregation, done);
 
 	// Clock
@@ -45,10 +45,13 @@ module tb_top();
 		fclusterID = 2;
 		fdestinationID = 3;
 		isAggregated = 0;
+		MY_BATTERY_STAT = 16'h4000;
+
+		//isAggregated
 		@(posedge done);
-		$display("DONE!!!");
-			#10 en = 1;
-			#20 en = ~en;
+		//$display("DONE!!!");
+			en = 1;
+			#30 en = ~en;
 
 		fsourceID = 15;
 		fbatteryStat = 16'b0100000000000000; // 0.5
@@ -56,6 +59,22 @@ module tb_top();
 		fclusterID = 2;
 		fdestinationID = 3;
 		isAggregated = 1;
+
+		//existing neighbor
+		@(posedge done);
+		//$display("DONE!!!");
+			en = 1;
+			#30 en = ~en;
+
+		fsourceID = 4;
+		fbatteryStat = 16'b0100000000000000; // 0.5
+		fValue = 16'b0000011010000000; // idk
+		fclusterID = 2;
+		fdestinationID = 2;
+		isAggregated = 0;
+
+		//not destination
+
 /*
 		// existing neighbor
 		fsourceID = 1;
@@ -67,12 +86,12 @@ module tb_top();
 	end
 
 	initial begin
-	$dumpfile("tb_top.vcd");
-		$dumpvars(0, tb_top);
-        	//$vcdplusfile("tb_top.vpd"); //$dumpfile("tb_randomGenerator.vcd");
-        	//$vcdpluson;
-		//$sdf_annotate("../mapped/top.sdf", top);
-		#10000
+	//$dumpfile("tb_top.vcd");
+		//$dumpvars(0, tb_top);
+        	$vcdplusfile("func.vpd"); //$dumpfile("tb_randomGenerator.vcd");
+        	$vcdpluson;
+		$sdf_annotate("../mapped/top.sdf", t1);
+		#100000
 		$finish;
 	end
 endmodule
